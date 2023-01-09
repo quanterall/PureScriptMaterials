@@ -14,9 +14,12 @@
 
 ## Work In Progress
 
-This repository is (and likely will be for quite some time) a work in progress. Suggestions for
-articles on concepts and themes are welcome, as well as corrections/clarifications on already
-available material.
+This repository is based on
+[our HaskellMaterials repository](https://github.com/quanterall/HaskellMaterials) and is currently
+in the process of being adapted. This means that a lot of material will be in a transitional state
+and may outright just reference things from Haskell. Eventually this will stop being true and we
+will have converted all the material to PureScript equivalents. Bear in mind that this is a process
+that is likely to take some time.
 
 ## Chapters
 
