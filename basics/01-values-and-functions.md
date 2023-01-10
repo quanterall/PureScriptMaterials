@@ -1,7 +1,6 @@
 # Values and functions (& basic types)
 
 - [Values and functions (& basic types)](#values-and-functions--basic-types)
-  - [Running examples](#running-examples)
   - [Values](#values)
     - [Exercises (Values)](#exercises-values)
   - [Functions](#functions)
@@ -26,90 +25,81 @@
   - [A note on functions, their parameter order and partial application](#a-note-on-functions-their-parameter-order-and-partial-application)
     - [Don't worry about mis-designing this](#dont-worry-about-mis-designing-this)
 
-## Running examples
+All programs are made up out of values and functions that operate on those values. Here we'll look
+at those basic building blocks.
 
-If you want to run the examples, I recommend installing `stack` via the link found in the README and
-using our ready-made template for small applications: `stack new project-name quanterall/basic`.
-This will give you an already set-up project and you can put the example code in the `Library.hs`
-file.
+## A note about dependencies
 
-If you are so inclined, you can use development containers to get a functioning development
-environment that I've set up; the prompt should pop up when you open the project. If you don't feel
-like you want this, you can install the "Simple GHC (Haskell) Integration" (extension ID
-dramforever.vscode-ghc-simple`) in VSCode for a setup that is known to work. When you save you
-should be able to get compiler warnings and errors.
+PureScript has comparatively great dependency management, but it also follows a philosophy when it
+comes to dependencies that may catch you off guard. Many functions you might expect to be in the
+`Prelude` are not. When a module requires a dependency we will note the import statement at the
+top of the code snippet with a comment that says how to install it. For example:
 
-Most examples have (and should have) the needed imports in the examples themselves, so if you find
-one that doesn't, please let me know.
+```purescript
+import Prelude
 
-If you want to run the examples interactively you can run `stack repl` in the root directory of the
-generated project and it will start an interactive session where you can execute the functions that
-have been defined, as well as all the standard library. If you want to make changes and see these
-reflected in the session, you can issue the `:r` command in it and it will reload the project files.
+import Data.String.Utils as StringUtils -- run `spago install stringutils && spago build`
+
+hasCorrectScope :: String -> Boolean
+hasCorrectScope string = StringUtils.startsWith ":scope:" string
+```
 
 ## Values
 
-The bread and butter of a Haskell program is of course values and functions.
-
 Before a value or a function definition comes the type of the definition. This is by convention to a
 large degree, we don't actually **have to** specify types for a lot of things depending on whether
-or not the compiler can figure them out itself. Even so, most projects will be set up to warn you
-when a top-level definition doesn't have an explicit type for the simple reason that it's part of
-good documentation to specify the intended type.
+or not the compiler can figure them out itself. If you don't have a type for a definition in your
+module (at the "top-level", meaning not inside an inner scope of a function) you'll get a warning
+that says as much. Type signatures are both a specification and a very basic documentation tool and
+adding them to your code is a generally good idea.
 
 A type signature is written with the name of the thing it's for, followed by `::` and then the type:
 
-```haskell
+```purescript
 myValue :: Int
 ```
 
 The actual definition for it comes immediately after and is written with `=` to signify that the
 name on the left is equal to the expression on the right:
 
-```haskell
+```purescript
 myValue :: Int
 myValue = 42
 ```
 
-The basic types in Haskell:
+The basic types in PureScript:
 
-```haskell
+```purescript
+module BasicTypes where
+
 import Prelude
 
-myAnswerToEverything :: Int -- Integer, limited in size
+myAnswerToEverything :: Int
 myAnswerToEverything = 42
-
-myInteger :: Integer -- Integer, can grow as needed
-myInteger = 42
 
 myChar :: Char -- A single character
 myChar = '$'
 
-myFloat :: Float -- 32-bit floating point value
+myFloat :: Number -- Always written with a decimal point in PureScript
 myFloat = 1337.0
 
-myDouble :: Double -- 64-bit floating point value
-myDouble = 1337.0
+myBool :: Boolean -- `true` or `false`
+myBool = false
 
-myBool :: Bool -- `True` or `False`
-myBool = False
-
-myString :: String -- Actually just a type alias for a list of characters; `[Char]`
+myString :: String
 myString = "This is not the best string in the world, it's just a tribute"
 
 -- `String`s also handle "exotic" script
 helloThere :: String
-helloThere = "Ехо... Генерал Кеноби"
+helloThere = "И един мармот завива шоколада в станион"
 ```
 
 ### Exercises (Values)
 
-1. Define a value with the name `myOwnValue` with the type `Double` and the value `42`.
+1. Define a value with the name `myOwnValue` with the type `Number` and the value `42`. What
+   happens?
 
-2. Define a value with the type `String` and the value `['h', 'e', 'l', 'l', 'o']`, then a value
-   with the type `String` and the value `"hello"`. Why do both of these work?
-
-3. Define a value with the type `String` and the value `'hello'`. What happens and why do you think
+2. Define a value with the type `String` and the value `'hello'`. What happens and why do you think
    that is?
 
 ## Functions
@@ -118,7 +108,7 @@ Functions are written much like values, but have arrows in their type. The types
 leftmost, represent the arguments/parameters passed to the function, with the final (rightmost) one
 representing the return value.
 
-```haskell
+```purescript
 import Prelude
 
 --          a      b     result
@@ -129,7 +119,7 @@ addInts a b = a + b
 Calling functions, as we can see above, can be done via infix notation when they are operators. We
 could also call the operator in a prefix position:
 
-```haskell
+```purescript
 import Prelude
 
 --          a      b     result
@@ -140,7 +130,7 @@ addInts a b = (+) a b
 The application of a function is done by just writing the function name followed by a space and then
 spaces between the parameters, making it as lightweight an operation as possible.
 
-```haskell
+```purescript
 import Prelude
 
 --                x    divisor result
@@ -160,7 +150,7 @@ remainder of dividing it by the second argument. Here we check whether or not th
 
 We could also write the division as follows:
 
-```haskell
+```purescript
 import Prelude
 
 --                x    divisor result
@@ -174,11 +164,11 @@ isDivisibleBy x divisor =
 This can be used to make code read more intuitively and is very common in the case of checking if
 something is a member of a map, list or the like:
 
-```haskell
+```purescript
 key `Map.member` ourMap -- Is the key defined in the map?
 ```
 
-```haskell
+```purescript
 element `List.elem` ourList -- Is the element present in the list?
 ```
 
@@ -188,32 +178,32 @@ an individual basis in terms of whether or not it makes the code more or less ea
 
 ### Boolean & arithmetic operations
 
-|   Math  | Haskell   | Notes |
-| :-----: | :-----:   | :-------------------------------------: |
-|    +    |      +    |                                         |
-|    -    |      -    |                                         |
-|    *    |      *    |                                         |
-|    /    |      /    |                                         |
-|    >    |      >    |                                         |
-|    <    |      <    |                                         |
-|    ≥    |     >=    |                                         |
-|    ≤    |     <=    |                                         |
-|    =    |     ==    |                                         |
-|    ≠    |     /=    |                                         |
-|    xⁿ   |    x ^ n  | x is numeric, n is integral             |
-|    xⁿ   |   x ** n  | x & n are both floating point values    |
-| x mod n | x `rem` n | x and n are integral [0]                |
-| x mod n | x `mod` n | x and n are integral [0]                |
+|   Math  |  PureScript  | Notes |
+| :-----: |  :-----:     | :-------------------------------------: |
+|    +    |       +      |                                         |
+|    -    |       -      |                                         |
+|    *    |       *      |                                         |
+|    /    |       /      |                                         |
+|    >    |       >      |                                         |
+|    <    |       <      |                                         |
+|    ≥    |      >=      |                                         |
+|    ≤    |      <=      |                                         |
+|    =    |      ==      |                                         |
+|    ≠    |      /=      |                                         |
+|    xⁿ   |     x ^ n    | x is numeric, n is integral             |
+|    xⁿ   |    x ** n    | x & n are both floating point values    |
+| x mod n |  x `rem` n   | x and n are integral [0]                |
+| x mod n |  x `mod` n   | x and n are integral [0]                |
 
-| Math |  C   | Haskell |        Notes        |
-| :--: | :-:  | :-----: | :-----------------: |
-|  ¬   |  !   |   not   |                     |
-|  ∧   |  &&  |   &&    |                     |
-|  ∨   |  ǀǀ  |   ǀǀ    | Two pipe characters |
+| Math |  C   | PureScript |        Notes        |
+| :--: | :-:  |  :-----:   | :-----------------: |
+|  ¬   |  !   |    not     |                     |
+|  ∧   |  &&  |    &&      |                     |
+|  ∨   |  ǀǀ  |    ǀǀ      | Two pipe characters |
 
 [0]:
 
-```haskell
+```purescript
 -- Note: Use `rem` if you know your parameters are both positive
 
 5 `mod` 3 == 2
@@ -232,9 +222,13 @@ an individual basis in terms of whether or not it makes the code more or less ea
 Arithmetic can only be done with numbers of the same type, so what happens when we want to divide an
 integer number with a floating point number? Let's see:
 
-```haskell
+```purescript
+import Prelude
+
+import Data.Int as Int -- run `spago install integers` to get this package
+
 --              integer  float   result
-divideInteger :: Int -> Float -> Float
+divideInteger :: Int -> Number -> Number
 -- This is the same as `(fromIntegral x) / f` because `/` divides everything on the left by
 -- everything on the right.
 -- `fromIntegral` is a function that takes anything integer-like and turns it into a `Float`.
@@ -244,14 +238,14 @@ divideInteger integer float = fromIntegral integer / float
 Likewise we can also take a float and turn it into an integer, though this can obviously lead to a
 loss of precision in our calculations:
 
-```haskell
+```purescript
 subtractRoundedFloat :: Int -> Float -> Int
 subtractRoundedFloat int float = int - round float
 ```
 
 If we were to run this we'd see:
 
-```haskell
+```purescript
 Q> subtractRoundedFloat 5 5.5
 -1
 Q> subtractRoundedFloat 5 5.4
@@ -262,7 +256,7 @@ Q> subtractRoundedFloat 5 5.4
 
 1. Define a function that returns whether or not an `Int` is zero.
 
-```haskell
+```purescript
 Q> isZero 1
 False
 Q> isZero 0
@@ -271,7 +265,7 @@ True
 
 2. Define a function that returns whether or not a `Float` is greater than zero.
 
-```haskell
+```purescript
 Q> isGreaterThanZero 1.2
 True
 Q> isGreaterThanZero 0.0
@@ -280,7 +274,7 @@ False
 
 3. Define a function that adds 1/10th of a Double to itself.
 
-```haskell
+```purescript
 Q> addOneTenth 1.0
 1.1
 Q> addOneTenth 0.1
@@ -290,7 +284,7 @@ Q> addOneTenth 0.1
 4. Define a function that takes 2 `Float`s `length'` & `width` and returns the area of the rectangle
    they make up.
 
-```haskell
+```purescript
 Q> rectangleArea 2.5 3
 7.5
 Q> rectangleArea 2 2
@@ -299,7 +293,7 @@ Q> rectangleArea 2 2
 
 5. Define a function that takes a radius of type `Float` and returns the area of a circle[0].
 
-```haskell
+```purescript
 Q> circleArea 3.5
 38.484512
 Q> circleArea 2.1
@@ -309,7 +303,7 @@ Q> circleArea 2.1
 6. Define a function `calculateBMI` that takes a `Float` representing weight in kilograms and an
    `Int` representing height in centimeters and returns the person's BMI.
 
-```haskell
+```purescript
 Q> bmi 185 90
 26.3
 Q> bmi 165 60
@@ -332,7 +326,7 @@ them that both the `True` and `False` branch need to be present, and both branch
 the same type of value. This is because `if`, like most other things in Haskell, is an expression
 and the result can be bound to a name.
 
-```haskell
+```purescript
 value :: Int -> Int
 value x = if x < 10 then x else 10
 
@@ -347,7 +341,7 @@ Let's look at a few ways to ask questions about values in the case of "clamping"
 
 ### Guards
 
-```haskell
+```purescript
 import Prelude
 
 -- | Limits a given integer to be within the range @lowerBound <= value <= upperBound@.
@@ -373,7 +367,7 @@ clause.
 1. Define a function that takes two `Int`s and returns the biggest of the two. Implement it both
    with function guards as well as `if`.
 
-```haskell
+```purescript
 Q> biggest 2 1
 2
 Q> biggest 1 2
@@ -385,7 +379,7 @@ Q> biggest 1 (-2)
 2. Define a function that takes two `Int`s and returns the smallest of the two. Implement it both
    with function guards as well as `if`.
 
-```haskell
+```purescript
 Q> smallest 2 1
 1
 Q> smallest 1 2
@@ -397,7 +391,7 @@ Q> smallest 1 (-2)
 3. Define a function that subtracts an integer from another, but if the result is less than zero,
    instead return `0`.
 
-```haskell
+```purescript
 Q> subtractPositive 3 1
 2
 Q> subtractPositive 1 3
@@ -407,7 +401,7 @@ Q> subtractPositive 1 3
 4. Define a function that takes an `Int` and if it's smaller than zero returns `0`, if it's bigger
    than 255 returns `255`. Otherwise it returns the integer itself.
 
-```haskell
+```purescript
 Q> clampByteValue 365
 255
 Q> clampByteValue (-255)
@@ -423,7 +417,7 @@ Q> clampByteValue 128
 Sometimes you will see a dollar sign operator (`$`) in code. This is actually a utility operator
 meant for function application:
 
-```haskell
+```purescript
 f :: Int -> String
 f x = show (deriveFlorbFactorFromMerkleNumber (castToMerkleNumber x))
 
@@ -441,7 +435,7 @@ When you apply a function, you can choose to **not** pass all the arguments it's
 will result in a function that expects the remaining arguments and that will have the same return
 value:
 
-```haskell
+```purescript
 import Prelude
 
 addInts :: Int -> Int -> Int
@@ -467,7 +461,7 @@ expression of the function, i.e. what usually comes after `=` in a normal functi
 
 ### Common design patterns with partial application
 
-```haskell
+```purescript
 import qualified Data.List as List
 import Prelude
 
@@ -491,7 +485,7 @@ mapping over a list and adding 42 to each item in the list.
 We can also partially apply our `+`. The function that we are passing to `List.map` is expected to
 be of type `Int -> Int`, which is what we get when we write `(+ 42)`:
 
-```haskell
+```purescript
 import qualified Data.List as List
 import Prelude
 
@@ -508,7 +502,7 @@ as an operator like `-` would behave differently depending on which side you are
 
 1. Define a function that takes a list of `Int`s and multiplies each with `2`. Remember `map`[0].
 
-```haskell
+```purescript
 Q> multiplyAllByTwo [1, 2, 3]
 [2, 4, 6]
 Q> multiplyAllByTwo []
@@ -517,7 +511,7 @@ Q> multiplyAllByTwo []
 
 2. Define a function that takes a list of `Int`s and squares each. Remember `map`[0].
 
-```haskell
+```purescript
 Q> squareAll [1, 2, 3]
 [1, 4, 9]
 Q> squareAll []
@@ -531,7 +525,7 @@ Q> squareAll [-1, -2, -3]
    Define a function that takes all elements that are equal to `0` from a list. Use partial
    application both with `filter` and when constructing the predicate.
 
-```haskell
+```purescript
 Q> allZeros [0, 1, 0, 2, 0, 3]
 [0, 0, 0]
 Q> allZeros [1..9]
@@ -541,7 +535,7 @@ Q> allZeros [1..9]
 4. Define a function that returns all of the `Int`s in a list over `0`, use partial application for
    both the predicate and `filter`.
 
-```haskell
+```purescript
 Q> numbersAboveZero [0, 1, 0, 2, 0, 3]
 [1, 2, 3]
 Q> numbersAboveZero [1..9]
@@ -552,7 +546,7 @@ Q> numbersAboveZero [1..9]
    that is above 10. `takeWhile`[2] can be useful for this. Use partial application both for
    `takeWhile`[2] and the predicate you pass to it.
 
-```haskell
+```purescript
 Q> takeBelow10 [5..15]
 [5, 6, 7, 8, 9]
 Q> takeBelow10 [1..9]
@@ -564,7 +558,7 @@ Q> takeBelow10 []
 6. Define a function that checks whether or not all `Int`s in a a list are even. Use notes to figure
    out how and use partial application for your definition.
 
-```haskell
+```purescript
 Q> areAllEven [2, 4..10]
 True
 Q> areAllEven [1..9]
@@ -587,7 +581,7 @@ Partial application is especially useful in pipelines, since we can construct ne
 partially applying other functions, easily creating a function that takes the result of a previous
 operation and returning a new one, possibly passing it along to yet another function:
 
-```haskell
+```purescript
 import Control.Category ((>>>))
 import Data.Function ((&))
 import Prelude
@@ -645,7 +639,7 @@ using function composition and partial application to get the answer to a mildly
 
 Let's first look at the given example numbers in action:
 
-```haskell
+```purescript
 import Data.Function ((&))
 import Prelude
 
@@ -662,7 +656,7 @@ solution =
 
 We can use a shorthand plus `takeWhile` to make this a bit neater:
 
-```haskell
+```purescript
 import Data.Function ((&))
 import Prelude
 
@@ -681,7 +675,7 @@ solution =
 
 If we now set an upper bound as a parameter we can get the solution to the actual problem:
 
-```haskell
+```purescript
 import Data.Function ((&))
 import Prelude
 
@@ -702,7 +696,7 @@ solution upperBound =
 
 If we wanted to support using different divisors we could also do the following:
 
-```haskell
+```purescript
 import Data.Function ((&))
 import Prelude
 
@@ -731,7 +725,7 @@ solution upperBound divisors =
    - a named argument; with `&`
    - an unnamed argument; with `>>>`
 
-```haskell
+```purescript
 Q> multipliedEvenSum [2, 4..10]
 60
 Q> multipliedEvenSum [1..9]
@@ -748,7 +742,7 @@ Q> multipliedEvenSum [1, 3..9]
    - a named argument; with `&`
    - an unnamed argument; with `>>>`
 
-```haskell
+```purescript
 Q> isSumOfMultipliedLeadingEvensEven [2, 4..10]
 True
 Q> isSumOfMultipliedLeadingEvensEven [2, 4, 5, 6]
@@ -760,7 +754,7 @@ True
 3. Define a function that takes the last 3 elements of a `[Int]` and gets the average of them. Use
    notes as inspiration.
 
-```haskell
+```purescript
 Q> averageOfLast3 [2, 4..10]
 8.0
 Q> averageOfLast3 [2, 4, 5, 6]
@@ -775,7 +769,7 @@ Q> averageOfLast3 []
    may need to start out with an anonymous function[9] somewhere in order to see how you could go
    from that to a partially applied function.
 
-```haskell
+```purescript
 Q> headingNames ["# Functions", "## Pipelines using partial application", "Random text"]
 [ "Functions"
 , "Pipelines using partial application"
@@ -807,7 +801,7 @@ these on-demand just by partially applying them.
 
 If we take our `clamp` function from before as an example:
 
-```haskell
+```purescript
 -- Limits a value to be within the range `lowerBound <= value <= upperBound`
 clamp :: Int -> Int -> Int -> Int
 clamp lowerBound upperBound value
