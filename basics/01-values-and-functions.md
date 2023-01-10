@@ -133,13 +133,15 @@ spaces between the parameters, making it as lightweight an operation as possible
 ```purescript
 import Prelude
 
+import Data.Int as Int
+
 --                x    divisor result
 isDivisibleBy :: Int -> Int -> Boolean
 isDivisibleBy x divisor =
   -- When we want to divide our problem into smaller parts we can use `let`.
   -- `rem` here is a function that takes an integer and returns the remainder of dividing it by the
   -- second argument. It is the same as the `%` operator (modulo) from C, JavaScript, and so on.
-  let remainderOfDivision = rem x divisor
+  let remainderOfDivision = Int.rem x divisor
   -- `let` has to be followed by `in` and then the final expression that is to be executed.
    in remainderOfDivision == 0
 ```
@@ -153,11 +155,13 @@ We could also write the division as follows:
 ```purescript
 import Prelude
 
+import Data.Int as Int
+
 --                x    divisor result
 isDivisibleBy :: Int -> Int -> Boolean
 isDivisibleBy x divisor =
   -- Note how we surround the function in backticks (`) to be able to put it in the infix position.
-  let remainderOfDivision = x `rem` divisor
+  let remainderOfDivision = x `Int.rem` divisor
    in remainderOfDivision == 0
 ```
 
@@ -165,10 +169,14 @@ This can be used to make code read more intuitively and is very common in the ca
 something is a member of a map, list or the like:
 
 ```purescript
+import Data.Map as Map
+
 key `Map.member` ourMap -- Is the key defined in the map?
 ```
 
 ```purescript
+import Data.List as List
+
 element `List.elem` ourList -- Is the element present in the list?
 ```
 
@@ -262,18 +270,18 @@ If we were to run this we'd see:
 
 ```purescript
 > isZero 1
-False
+false
 > isZero 0
-True
+true
 ```
 
 2. Define a function that returns whether or not a `Number` is greater than zero.
 
 ```purescript
 > isGreaterThanZero 1.2
-True
+true
 > isGreaterThanZero 0.0
-False
+false
 ```
 
 3. Define a function that adds 1/10th of a Double to itself.
@@ -316,7 +324,8 @@ False
 
 #### Exercise notes (Functions)
 
-0. `pi` is available by default.
+0. `pi` can be imported from `Data.Number` from the package `numbers`. Install it by running
+   `spago install numbers && spago build`.
 
 ## Asking questions about values
 
@@ -325,9 +334,9 @@ whether or not it matches some kind of predicate.
 
 ### `if` expressions
 
-`if` in Haskell is a lot like `if` in other languages, with the one slight difference to some of
-them that both the `True` and `False` branch need to be present, and both branches need to return
-the same type of value. This is because `if`, like most other things in Haskell, is an expression
+`if` in PureScript is a lot like `if` in other languages, with the one slight difference to some of
+them that both the `true` and `false` branch need to be present, and both branches need to return
+the same type of value. This is because `if`, like most other things in PureScript, is an expression
 and the result can be bound to a name.
 
 ```purescript
@@ -361,7 +370,7 @@ questions to ask about the value and we can do so immediately in what are known 
 
 Note that we do not have an immediate `=` after our parameters but instead each `|` introduces a new
 question that we pose, a new **guard**. If the boolean expression that follows the pipe (`|`)
-evaluates to `True` the expression to the right of `=` is what will be returned.
+evaluates to `true` the expression to the right of `=` is what will be returned.
 
 The word `otherwise` is an always matching case and we can use this case as an "for all other cases"
 clause.
@@ -466,41 +475,51 @@ expression of the function, i.e. what usually comes after `=` in a normal functi
 ### Common design patterns with partial application
 
 ```purescript
-import qualified Data.List as List
 import Prelude
 
 -- | Adds 42 to every item in a list
-add42ToAll :: [Int] -> [Int]
-add42ToAll = List.map (\x -> x + 42)
+add42ToAll :: Array Int -> Array Int
+add42ToAll = map (\x -> x + 42)
 
-add42ToAll' :: [Int] -> [Int]
-add42ToAll' list = List.map (\x -> x + 42) list
+add42ToAll' :: Array Int -> Array Int
+add42ToAll' array = map (\x -> x + 42) array
 ```
 
 In this example we are creating a lambda that takes one argument and adds 42 to it. This is passed
-to a partially applied `List.map` that takes a list of `Int` as the second argument. When we don't
-give this argument, what we get back is exactly the type signature that `add42ToAll` has:
-`[Int] -> [Int]`. The second version makes this list argument visible. As a rule, when you have
-arguments both on the left side in the same order as you have them on the right side of a definition
-you can remove them on both sides. `list` appears here as the last argument both in the arguments
-and the implementation and so we can get rid of it, to talk only about the essence of the function;
-mapping over a list and adding 42 to each item in the list.
+to a partially applied `map` that takes an array of `Int` as the second argument. When we don't give
+this argument, what we get back is exactly the type signature that `add42ToAll` has:
+`Array Int -> Array Int`. The second version makes this argument visible. As a rule, when you have
+arguments both on the left side in the same order as you have them on the right side of a
+definition you can remove them on both sides. `list` appears here as the last argument both in the
+arguments and the implementation and so we can get rid of it, to talk only about the essence of the
+function; "mapping" over a list and adding 42 to each item in the list.
 
-We can also partially apply our `+`. The function that we are passing to `List.map` is expected to
-be of type `Int -> Int`, which is what we get when we write `(+ 42)`:
+We can also create a function that does the same thing as `(\x -> x + 42)` without naming the
+parameter:
 
 ```purescript
-import qualified Data.List as List
 import Prelude
 
 -- | Adds 42 to every item in a list
-add42ToAll :: [Int] -> [Int]
-add42ToAll = List.map (+ 42) -- could also be `(42 +)`
+add42ToAll :: Array Int -> Array Int
+add42ToAll = map (_ + 42) -- could also be `(42 + _)`
 ```
 
-Since operators expect arguments both on the left and right side we can partially apply whichever
-side we want, so `(42 +)` is also valid. The resulting behavior obviously depends on the operator,
-as an operator like `-` would behave differently depending on which side you are omitting.
+The underscore here represents a placeholder where the argument we are expecting will go. In the
+case of `+` it doesn't really matter which side it goes on, but in the case of `-`, for example, it
+would:
+
+```purescript
+import Prelude
+
+-- | Subtracts 42 from every item in a list
+subtract42FromAll :: Array Int -> Array Int
+subtract42FromAll = map (_ - 42)
+
+-- | Subtracts every item in a list from 42
+subtractAllFrom42 :: Array Int -> Array Int
+subtractAllFrom42 = map (42 - _)
+```
 
 ### Exercises (Partial application)
 
@@ -524,10 +543,10 @@ as an operator like `-` would behave differently depending on which side you are
 [1, 4, 9]
 ```
 
-3. `filter`[1] is a function that takes all elements that match a predicate from a list. This
-   predicate is always a function that takes an element in the list and returns a boolean value.
-   Define a function that takes all elements that are equal to `0` from a list. Use partial
-   application both with `filter` and when constructing the predicate.
+3. `filter`[1] is a function that takes all elements that match a predicate from an array. This
+   predicate is always a function that takes an element in the array and returns a boolean value.
+   Define a function that takes all elements that are equal to `0` from an array. Use partial
+   application when using `filter`.
 
 ```purescript
 > allZeros [0, 1, 0, 2, 0, 3]
@@ -536,8 +555,8 @@ as an operator like `-` would behave differently depending on which side you are
 []
 ```
 
-4. Define a function that returns all of the `Int`s in a list over `0`, use partial application for
-   both the predicate and `filter`.
+4. Define a function that returns all of the `Int`s in a list over `0`, use a placeholder for
+   constructing the predicate function and partial application when using `filter`.
 
 ```purescript
 > numbersAboveZero [0, 1, 0, 2, 0, 3]
@@ -547,8 +566,7 @@ as an operator like `-` would behave differently depending on which side you are
 ```
 
 5. Define a function that takes numbers from a list of `Int`s, stopping when it reaches a number
-   that is above 10. `takeWhile`[2] can be useful for this. Use partial application both for
-   `takeWhile`[2] and the predicate you pass to it.
+   that is above 10. `takeWhile`[2] can be useful for this.
 
 ```purescript
 > takeBelow10 [5..15]
@@ -559,25 +577,25 @@ as an operator like `-` would behave differently depending on which side you are
 []
 ```
 
-6. Define a function that checks whether or not all `Int`s in a a list are even. Use notes to figure
-   out how and use partial application for your definition.
+6. Define a function that checks whether or not all `Int`s in an array are even. Use the exercise
+   notes below to figure out how to construct your solution and use partial application for your
+   definition.
 
 ```purescript
 > areAllEven [2, 4..10]
-True
+true
 > areAllEven [1..9]
-False
+false
 > areAllEven []
-True
+true
 ```
 
 #### Exercise notes (Partial application)
 
-0. [map](https://www.stackage.org/haddock/lts-17.12/base-4.14.1.0/Prelude.html#v:map)
-1. [filter](https://www.stackage.org/haddock/lts-17.12/base-4.14.1.0/Prelude.html#v:filter)
-2. [takeWhile](https://www.stackage.org/haddock/lts-17.12/base-4.14.1.0/Prelude.html#v:takeWhile)
-3. [all](https://www.stackage.org/haddock/lts-17.12/base-4.14.1.0/Prelude.html#v:all)
-4. [even](https://www.stackage.org/haddock/lts-17.12/base-4.14.1.0/Prelude.html#v:even)
+1. [filter](https://pursuit.purescript.org/packages/purescript-arrays/7.1.0/docs/Data.Array#v:filter)
+2. [takeWhile](https://pursuit.purescript.org/packages/purescript-arrays/7.1.0/docs/Data.Array#v:takeWhile)
+3. [all](https://pursuit.purescript.org/packages/purescript-arrays/7.1.0/docs/Data.Array#v:all)
+4. [even](https://pursuit.purescript.org/packages/purescript-integers/6.0.0/docs/Data.Int#v:even)
 
 ## Pipelines using partial application
 
@@ -586,50 +604,54 @@ partially applying other functions, easily creating a function that takes the re
 operation and returning a new one, possibly passing it along to yet another function:
 
 ```purescript
-import Control.Category ((>>>))
-import Data.Function ((&))
-import Prelude
-
--- `/=` is the "not equal" operator in Haskell, analogous to `!=` in many other languages.
--- Note how we're again using an operator with only one argument, and are missing the left-most one,
--- which gives us a function expecting one argument, which is exactly what the predicate we pass to
--- `takeWhile` here expects: `Char -> Boolean`
+-- `/=` is the "not equal" operator in PureScript, analogous to `!=` in many
+-- other languages.
+-- Note how we're again using an operator with only one named argument which
+-- gives us a function expecting one argument, which is exactly what the
+-- predicate we pass to `takeWhile` here expects: `CodePoint -> Boolean`
 
 -- Types for this example:
 --
--- reverse :: String -> String
--- takeWhile :: (Char -> Boolean) -> String -> String
--- length :: String -> Int
+-- Array.reverse :: String -> String
+-- Array.takeWhile :: (CodePoint -> Boolean) -> Array CodePoint -> Array CodePoint
+-- Array.length :: Array CodePoint -> Int
 
-dataPartLength :: String -> Int
-dataPartLength = length . takeWhile (/= '1') . reverse
+import Prelude
+
+import Data.Array as Array
+import Data.String.CodePoints as CodePoints
 
 dataPartLength' :: String -> Int
-dataPartLength' = reverse >>> takeWhile (/= '1') >>> length
+dataPartLength' =
+  CodePoints.toCodePointArray
+    >>> Array.reverse
+    >>> Array.takeWhile (_ /= CodePoints.codePointFromChar '1')
+    >>> Array.length
 
 dataPartLength'' :: String -> Int
-dataPartLength'' string = string & reverse & takeWhile (/= '1') & length
+dataPartLength'' string =
+  string
+    # CodePoints.toCodePointArray
+    # Array.reverse
+    # Array.takeWhile (_ /= CodePoints.codePointFromChar '1')
+    # Array.length
 ```
 
-In the above examples we are pipelining functions that operate on the result of a previous function
-call. The first example does this using the `.` operator, which represents classic function
-composition. One thing to note about this is that the application order is read from right to left,
-so we are applying `reverse` first, then `takeWhile`, then `length`.
+The examples here show the same function written in two different ways. In the first one we are
+composing functions to create new functions. When `toCodePointArray` is composed with `reverse` we
+get a function that expects a `String` and returns an `Array CodePoint`. When that function is then
+composed further with `takeWhile` we have a function from `String` to `Array CodePoint`. Ultimately
+we've composed that together with `length` as well and end up with a function from `String` to `Int`.
 
-`reverse` takes a `String` and will reverse it. The result is then passed to `takeWhile (/= '1')`
-which will take all initial characters of the string until we find one that is `'1'`. The result of
-that is then passed to `length` which will return the length.
+This kind of composition is very useful because it rarely talks about any redundant information in
+a series of transformations. We can't always express things like this, but when we can it makes for
+a very concise and easy-to-modify way of expressing these kinds of things.
 
-The example using `>>>` does the same thing, but can be read from left to right. The last example,
-using the operator `&` is the same as commonly used pipeline operators like `|>` from F#, Elm &
-Elixir, and might be more readable to some. It works by taking whatever value we have on the left
-side of it and passing it to the function on the right. Like F# and Elm the value is passed as the
-last argument to the function on the right, as opposed to Elixir where it is passed as the first.
-
-While we aren't changing the meaning of our program based on which way we compose our functions, We
-should always prefer to read our code left-to-right and up-to-down (because this is the already
-established reading direction in the rest of the language), meaning we should use `>>>` and
-`&`.
+The second example, using the `#` operator is the same as commonly used pipeline operators like `|>`
+from F#, Elm & Elixir, and might be more familiar to some. It works by taking whatever value we have
+on the left side of it and passing it to the function on the right. Like F# and Elm the value is
+passed as the last argument to the function on the right, as opposed to Elixir where it is passed
+as the first.
 
 ### A "Project Euler" example
 
@@ -644,56 +666,43 @@ using function composition and partial application to get the answer to a mildly
 Let's first look at the given example numbers in action:
 
 ```purescript
-import Data.Function ((&))
 import Prelude
+
+import Data.Int as Int
 
 isDivisibleBy :: Int -> Int -> Boolean
 isDivisibleBy x divisor =
   -- Note how we surround the function in backticks (`) to be able to put it in the infix position.
-  let remainderOfDivision = x `rem` divisor
+  let remainderOfDivision = x `Int.rem` divisor
    in remainderOfDivision == 0
 
 solution :: Int
 solution =
-  [1,2,3,4,5,6,7,8,9] & filter (\x -> x `isDivisibleBy` 3 || x `isDivisibleBy` 5) & sum -- 23
-```
-
-We can use a shorthand plus `takeWhile` to make this a bit neater:
-
-```purescript
-import Data.Function ((&))
-import Prelude
-
-isDivisibleBy :: Int -> Int -> Boolean
-isDivisibleBy x divisor =
-  -- Note how we surround the function in backticks (`) to be able to put it in the infix position.
-  let remainderOfDivision = x `rem` divisor
-   in remainderOfDivision == 0
-
-solution :: Int
-solution =
-  -- `[1..]` means "create an infinite list of increasing numbers starting from 1"
-  -- We never have an infinite list in memory, but rather take elements one by one until we reach 10
-  [1..] & takeWhile (< 10) & filter (\x -> x `isDivisibleBy` 3 || x `isDivisibleBy` 5) & sum -- 23
+  [1,2,3,4,5,6,7,8,9]
+    # Array.filter (\x -> x `isDivisibleBy` 3 || x `isDivisibleBy` 5)
+    # sum -- 23
 ```
 
 If we now set an upper bound as a parameter we can get the solution to the actual problem:
 
 ```purescript
-import Data.Function ((&))
 import Prelude
+
+import Data.Array as Array
+import Data.Foldable (sum)
+import Data.Int as Int
 
 isDivisibleBy :: Int -> Int -> Boolean
 isDivisibleBy x divisor =
   -- Note how we surround the function in backticks (`) to be able to put it in the infix position.
-  let remainderOfDivision = x `rem` divisor
+  let remainderOfDivision = x `Int.rem` divisor
    in remainderOfDivision == 0
 
 solution :: Int -> Int
 solution upperBound =
-  -- You could also write `[1..(upperBound - 1)]` and skip `takeWhile`, but for reasons explained
-  -- later on this doesn't make a difference in the execution of this function.
-  [1..] & takeWhile (< upperBound) & filter (\x -> x `isDivisibleBy` 3 || x `isDivisibleBy` 5) & sum
+  Array.range 1 (upperBound - 1)
+    # Array.filter (\x -> x `isDivisibleBy` 3 || x `isDivisibleBy` 5)
+    # sum
 
 -- `solution 1000` will give us the value 233168
 ```
@@ -701,23 +710,30 @@ solution upperBound =
 If we wanted to support using different divisors we could also do the following:
 
 ```purescript
-import Data.Function ((&))
 import Prelude
+
+import Data.Array as Array
+import Data.Foldable (sum)
+import Data.Int as Int
 
 isDivisibleBy :: Int -> Int -> Boolean
 isDivisibleBy x divisor =
   -- Note how we surround the function in backticks (`) to be able to put it in the infix position.
-  let remainderOfDivision = x `rem` divisor
-   in remainderOfDivision == 0
+  let
+    remainderOfDivision = x `Int.rem` divisor
+  in
+    remainderOfDivision == 0
 
-solution :: Int -> [Int] -> Int
+solution :: Int -> Array Int -> Int
 solution upperBound divisors =
   -- `any` takes a predicate/question and a list of inputs and answers the question:
-  -- "Are any of these true?"/"Do any of these return `True`?"
+  -- "Are any of these true?"/"Do any of these return `true`?"
   -- Here we are asking "Is X divisble by any of the passed in divisors?"
   -- We could also write `isDivisibleBy x` only, but it can be useful to use backticks to emphasize
   -- that `x` is the first argument, and to make it read as a question about `x`.
-  [1..] & takeWhile (< upperBound) & filter (\x -> any (x `isDivisibleBy`) divisors) & sum
+  Array.range 1 (upperBound - 1)
+    # Array.filter (\x -> Array.any (x `isDivisibleBy` _) divisors)
+    # sum
 
 -- `solution 1000 [3, 5]` will give us the value 233168
 ```
@@ -748,11 +764,11 @@ solution upperBound divisors =
 
 ```purescript
 > isSumOfMultipliedLeadingEvensEven [2, 4..10]
-True
+true
 > isSumOfMultipliedLeadingEvensEven [2, 4, 5, 6]
-True
+true
 > isSumOfMultipliedLeadingEvensEven []
-True
+true
 ```
 
 3. Define a function that takes the last 3 elements of a `[Int]` and gets the average of them. Use
@@ -784,17 +800,15 @@ True
 
 #### Exercise notes (Pipelines using partial application)
 
-0. Remember that `&` is defined in `Data.Function` and `>>>` is defined in `Control.Category`. These
-   can be imported with `import Data.Function ((&))` and `import Control.Category ((>>>))`.
-1. [sum](https://www.stackage.org/haddock/lts-17.12/base-4.14.1.0/Prelude.html#v:sum)
-2. [takeWhile](https://www.stackage.org/haddock/lts-17.12/base-4.14.1.0/Prelude.html#v:takeWhile)
-3. [dropWhile](https://www.stackage.org/haddock/lts-17.12/base-4.14.1.0/Prelude.html#v:dropWhile)
-4. [isPrefixOf](https://www.stackage.org/haddock/lts-17.12/base-4.14.1.0/Data-List.html#v:isPrefixOf)
-5. [any](https://www.stackage.org/haddock/lts-17.12/base-4.14.1.0/Prelude.html#v:any)
-6. [elem](https://www.stackage.org/haddock/lts-17.12/base-4.14.1.0/Prelude.html#v:elem)
-7. [take](https://www.stackage.org/haddock/lts-17.12/base-4.14.1.0/Prelude.html#v:take)
-8. [reverse](https://www.stackage.org/haddock/lts-17.12/base-4.14.1.0/Prelude.html#v:reverse)
-9. Lambdas are written like this: `\argumentOne argumentTwo -> bodyOfFunction`
+0. [sum](https://pursuit.purescript.org/packages/purescript-foldable-traversable/6.0.0/docs/Data.Foldable#v:sum)
+1. [takeWhile](https://pursuit.purescript.org/packages/purescript-arrays/7.1.0/docs/Data.Array#v:takeWhile)
+2. [dropWhile](https://pursuit.purescript.org/packages/purescript-arrays/7.1.0/docs/Data.Array#v:dropWhile)
+3. [startsWith](https://pursuit.purescript.org/packages/purescript-stringutils/0.0.10/docs/Data.String.Utils#v:startsWith)
+4. [any](https://pursuit.purescript.org/packages/purescript-arrays/7.1.0/docs/Data.Array#v:any)
+5. [elem](https://pursuit.purescript.org/packages/purescript-arrays/7.1.0/docs/Data.Array#v:elem)
+6. [take](https://pursuit.purescript.org/packages/purescript-arrays/7.1.0/docs/Data.Array#v:take)
+7. [reverse](https://pursuit.purescript.org/packages/purescript-arrays/7.1.0/docs/Data.Array#v:reverse)
+8. Lambdas are written like this: `\argumentOne argumentTwo -> bodyOfFunction`
 
 ## A note on functions, their parameter order and partial application
 
