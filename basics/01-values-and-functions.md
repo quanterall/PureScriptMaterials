@@ -80,8 +80,8 @@ myAnswerToEverything = 42
 myChar :: Char -- A single character
 myChar = '$'
 
-myFloat :: Number -- Always written with a decimal point in PureScript
-myFloat = 1337.0
+myNumber :: Number -- Always written with a decimal point in PureScript
+myNumber = 1337.0
 
 myBool :: Boolean -- `true` or `false`
 myBool = false
@@ -227,15 +227,15 @@ import Prelude
 
 import Data.Int as Int -- run `spago install integers && spago build`
 
---              integer  float   result
+--              integer  number   result
 divideInteger :: Int -> Number -> Number
--- This is the same as `(fromIntegral x) / f` because `/` divides everything on the left by
+-- This is the same as `(Int.toNumber integer) / number` because `/` divides everything on the left by
 -- everything on the right.
--- `fromIntegral` is a function that takes anything integer-like and turns it into a `Float`.
-divideInteger integer float = fromIntegral integer / float
+divideInteger :: Int -> Number -> Number
+divideInteger integer number = Int.toNumber integer / number
 ```
 
-Likewise we can also take a float and turn it into an integer, though this can obviously lead to a
+Likewise we can also take a number and turn it into an integer, though this can obviously lead to a
 loss of precision in our calculations:
 
 ```purescript
@@ -243,16 +243,16 @@ import Prelude
 
 import Data.Int as Int -- run `spago install integers && spago build`
 
-subtractRoundedFloat :: Int -> Number -> Int
-subtractRoundedFloat int float = int - Int.round float
+subtractRoundedNumber :: Int -> Number -> Int
+subtractRoundedNumber int number = int - Int.round number
 ```
 
 If we were to run this we'd see:
 
 ```purescript
-> subtractRoundedFloat 5 5.5
+> subtractRoundedNumber 5 5.5
 -1
-> subtractRoundedFloat 5 5.4
+> subtractRoundedNumber 5 5.4
 0
 ```
 
@@ -267,7 +267,7 @@ False
 True
 ```
 
-2. Define a function that returns whether or not a `Float` is greater than zero.
+2. Define a function that returns whether or not a `Number` is greater than zero.
 
 ```purescript
 > isGreaterThanZero 1.2
@@ -285,7 +285,7 @@ False
 0.11000000000000001
 ```
 
-4. Define a function that takes 2 `Float`s `length'` & `width` and returns the area of the rectangle
+4. Define a function that takes 2 `Number`s `length'` & `width` and returns the area of the rectangle
    they make up.
 
 ```purescript
@@ -295,7 +295,7 @@ False
 4.0
 ```
 
-5. Define a function that takes a radius of type `Float` and returns the area of a circle[0].
+5. Define a function that takes a radius of type `Number` and returns the area of a circle[0].
 
 ```purescript
 > circleArea 3.5
@@ -304,7 +304,7 @@ False
 13.854422
 ```
 
-6. Define a function `calculateBMI` that takes a `Float` representing weight in kilograms and an
+6. Define a function `calculateBMI` that takes a `Number` representing weight in kilograms and an
    `Int` representing height in centimeters and returns the person's BMI.
 
 ```purescript
