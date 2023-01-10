@@ -109,6 +109,8 @@ Fetching the new one and generating hashes.. (this might take some time)
 [info] Try running `spago build`
 ```
 
+You can learn more about `spago` [here](https://github.com/purescript/spago).
+
 ## Learning PureScript
 
 Learning PureScript is hard, much like learning any programming language. I've found that many people
