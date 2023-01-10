@@ -3,14 +3,14 @@
 - [PureScriptMaterials](#purescriptmaterials)
   - [Work In Progress](#work-in-progress)
   - [Chapters](#chapters)
+  - [Jordan's PureScript Reference](#jordans-purescript-reference)
+  - [Installing the build- and project management-tool `spago`](#installing-the-build--and-project-management-tool-spago)
   - [Learning PureScript](#learning-purescript)
     - [Resist the urge to try to learn exactly how everything works immediately](#resist-the-urge-to-try-to-learn-exactly-how-everything-works-immediately)
     - [Keep in mind that learning PureScript is about getting things done](#keep-in-mind-that-learning-purescript-is-about-getting-things-done)
     - [Category theory is a branch of mathematics](#category-theory-is-a-branch-of-mathematics)
     - [Asking questions is good](#asking-questions-is-good)
     - [Leave most of what you've heard at the door](#leave-most-of-what-youve-heard-at-the-door)
-  - [Installing the build- and project management-tool `spago`](#installing-the-build--and-project-management-tool-spago)
-  - [Jordan's PureScript Reference](#jordans-purescript-reference)
 
 ## Work In Progress
 
@@ -40,6 +40,74 @@ are readable from top to bottom in terms of the assumptions they make about know
 - [Testing](./basics/12-testing.md)
 - [Optics (lenses & prisms)](./basics/13-optics.md)
 - [Parsing with Megaparsec](./basics/14-parsing-with-megaparsec.md)
+
+## Jordan's PureScript Reference
+
+As this repository represents a more streamlined learning experience, it's helpful to know where to
+go in order to get a more complete picture of language and FP concepts. There is [a brilliant
+reference](https://jordanmartinez.github.io/purescript-jordans-reference-site/Preface.html) written
+by [Jordan Martinez](https://github.com/JordanMartinez/) that one can use to look up concepts.
+
+## Installing the build- and project management-tool `spago`
+
+PureScript is blessed with having a standard tool that most, if not all, people use: `spago`. I'll
+recommend installing with [`asdf`](https://asdf-vm.com) here, but you can explore other ways of
+installing it if you want:
+
+```bash
+$ asdf plugin add purescript
+...
+$ asdf plugin add spago
+...
+```
+
+When we've installed `purescript` and `spago` plug-ins in `asdf` we can list and install the latest
+versions of those tools:
+
+```bash
+$ asdf list all purescript
+...
+0.15.6
+0.15.6-1
+0.15.7-0
+0.15.7
+0.15.7-1
+0.15.7-2
+0.15.7-3
+0.15.7-4
+0.15.7-5
+0.15.7-6
+0.15.7-7
+0.15.7-8
+0.15.7-9
+$ asdf install purescript 0.15.7
+...
+$ asdf global purescript 0.15.7
+...
+
+0.20.7
+0.20.8
+0.20.9
+$ asdf install spago 0.20.9
+...
+$ asdf global spago 0.20.9
+```
+
+Now we should be able to start a new project with `spago` in any new directory:
+
+```bash
+$ mkdir ~/code/purescript/my-new-project
+...
+$ cd ~/code/purescript/my-new-project
+...
+$ spago init
+[info] Initializing a sample project or migrating an existing one..
+[info] Updating package-set tag to "psc-0.15.3-20220712"
+Fetching the new one and generating hashes.. (this might take some time)
+[info] Generating new hashes for the package set file so it will be cached.. (this might take some time)
+[info] Set up a local Spago project.
+[info] Try running `spago build`
+```
 
 ## Learning PureScript
 
@@ -122,70 +190,3 @@ PureScript for creating applications to solve problems, there is no reason to tr
 about the language (This actually applies to all languages and programming in general, but it's
 worth noting here specifically).
 
-## Installing the build- and project management-tool `spago`
-
-PureScript is blessed with having a standard tool that most, if not all, people use: `spago`. I'll
-recommend installing with [`asdf`](https://asdf-vm.com) here, but you can explore other ways of
-installing it if you want:
-
-```bash
-$ asdf plugin add purescript
-...
-$ asdf plugin add spago
-...
-```
-
-When we've installed `purescript` and `spago` plug-ins in `asdf` we can list and install the latest
-versions of those tools:
-
-```bash
-$ asdf list all purescript
-...
-0.15.6
-0.15.6-1
-0.15.7-0
-0.15.7
-0.15.7-1
-0.15.7-2
-0.15.7-3
-0.15.7-4
-0.15.7-5
-0.15.7-6
-0.15.7-7
-0.15.7-8
-0.15.7-9
-$ asdf install purescript 0.15.7
-...
-$ asdf global purescript 0.15.7
-...
-
-0.20.7
-0.20.8
-0.20.9
-$ asdf install spago 0.20.9
-...
-$ asdf global spago 0.20.9
-```
-
-Now we should be able to start a new project with `spago` in any new directory:
-
-```bash
-$ mkdir ~/code/purescript/my-new-project
-...
-$ cd ~/code/purescript/my-new-project
-...
-$ spago init
-[info] Initializing a sample project or migrating an existing one..
-[info] Updating package-set tag to "psc-0.15.3-20220712"
-Fetching the new one and generating hashes.. (this might take some time)
-[info] Generating new hashes for the package set file so it will be cached.. (this might take some time)
-[info] Set up a local Spago project.
-[info] Try running `spago build`
-```
-
-## Jordan's PureScript Reference
-
-As this repository represents a more streamlined learning experience, it's helpful to know where to
-go in order to get a more complete picture of language and FP concepts. There is [a brilliant
-reference](https://jordanmartinez.github.io/purescript-jordans-reference-site/Preface.html) written
-by [Jordan Martinez](https://github.com/JordanMartinez/) that one can use to look up concepts.
