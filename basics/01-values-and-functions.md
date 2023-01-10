@@ -31,7 +31,7 @@ at those basic building blocks.
 ## A note about dependencies
 
 PureScript has comparatively great dependency management, but it also follows a philosophy when it
-comes to dependencies that may catch you off guard. Many functions you might expect to be in the
+comes to dependencies that may catch you off guard. Many functions you might expect to be in
 `Prelude` are not. When a module requires a dependency we will note the import statement at the
 top of the code snippet with a comment that says how to install it. For example:
 
@@ -134,7 +134,7 @@ spaces between the parameters, making it as lightweight an operation as possible
 import Prelude
 
 --                x    divisor result
-isDivisibleBy :: Int -> Int -> Bool
+isDivisibleBy :: Int -> Int -> Boolean
 isDivisibleBy x divisor =
   -- When we want to divide our problem into smaller parts we can use `let`.
   -- `rem` here is a function that takes an integer and returns the remainder of dividing it by the
@@ -154,7 +154,7 @@ We could also write the division as follows:
 import Prelude
 
 --                x    divisor result
-isDivisibleBy :: Int -> Int -> Bool
+isDivisibleBy :: Int -> Int -> Boolean
 isDivisibleBy x divisor =
   -- Note how we surround the function in backticks (`) to be able to put it in the infix position.
   let remainderOfDivision = x `rem` divisor
@@ -225,7 +225,7 @@ integer number with a floating point number? Let's see:
 ```purescript
 import Prelude
 
-import Data.Int as Int -- run `spago install integers` to get this package
+import Data.Int as Int -- run `spago install integers && spago build`
 
 --              integer  float   result
 divideInteger :: Int -> Number -> Number
@@ -239,16 +239,20 @@ Likewise we can also take a float and turn it into an integer, though this can o
 loss of precision in our calculations:
 
 ```purescript
-subtractRoundedFloat :: Int -> Float -> Int
-subtractRoundedFloat int float = int - round float
+import Prelude
+
+import Data.Int as Int -- run `spago install integers && spago build`
+
+subtractRoundedFloat :: Int -> Number -> Int
+subtractRoundedFloat int float = int - Int.round float
 ```
 
 If we were to run this we'd see:
 
 ```purescript
-Q> subtractRoundedFloat 5 5.5
+> subtractRoundedFloat 5 5.5
 -1
-Q> subtractRoundedFloat 5 5.4
+> subtractRoundedFloat 5 5.4
 0
 ```
 
@@ -257,27 +261,27 @@ Q> subtractRoundedFloat 5 5.4
 1. Define a function that returns whether or not an `Int` is zero.
 
 ```purescript
-Q> isZero 1
+> isZero 1
 False
-Q> isZero 0
+> isZero 0
 True
 ```
 
 2. Define a function that returns whether or not a `Float` is greater than zero.
 
 ```purescript
-Q> isGreaterThanZero 1.2
+> isGreaterThanZero 1.2
 True
-Q> isGreaterThanZero 0.0
+> isGreaterThanZero 0.0
 False
 ```
 
 3. Define a function that adds 1/10th of a Double to itself.
 
 ```purescript
-Q> addOneTenth 1.0
+> addOneTenth 1.0
 1.1
-Q> addOneTenth 0.1
+> addOneTenth 0.1
 0.11000000000000001
 ```
 
@@ -285,18 +289,18 @@ Q> addOneTenth 0.1
    they make up.
 
 ```purescript
-Q> rectangleArea 2.5 3
+> rectangleArea 2.5 3
 7.5
-Q> rectangleArea 2 2
+> rectangleArea 2 2
 4.0
 ```
 
 5. Define a function that takes a radius of type `Float` and returns the area of a circle[0].
 
 ```purescript
-Q> circleArea 3.5
+> circleArea 3.5
 38.484512
-Q> circleArea 2.1
+> circleArea 2.1
 13.854422
 ```
 
@@ -304,9 +308,9 @@ Q> circleArea 2.1
    `Int` representing height in centimeters and returns the person's BMI.
 
 ```purescript
-Q> bmi 185 90
+> bmi 185 90
 26.3
-Q> bmi 165 60
+> bmi 165 60
 22.0
 ```
 
@@ -368,11 +372,11 @@ clause.
    with function guards as well as `if`.
 
 ```purescript
-Q> biggest 2 1
+> biggest 2 1
 2
-Q> biggest 1 2
+> biggest 1 2
 2
-Q> biggest 1 (-2)
+> biggest 1 (-2)
 1
 ```
 
@@ -380,11 +384,11 @@ Q> biggest 1 (-2)
    with function guards as well as `if`.
 
 ```purescript
-Q> smallest 2 1
+> smallest 2 1
 1
-Q> smallest 1 2
+> smallest 1 2
 1
-Q> smallest 1 (-2)
+> smallest 1 (-2)
 -2
 ```
 
@@ -392,9 +396,9 @@ Q> smallest 1 (-2)
    instead return `0`.
 
 ```purescript
-Q> subtractPositive 3 1
+> subtractPositive 3 1
 2
-Q> subtractPositive 1 3
+> subtractPositive 1 3
 0
 ```
 
@@ -402,11 +406,11 @@ Q> subtractPositive 1 3
    than 255 returns `255`. Otherwise it returns the integer itself.
 
 ```purescript
-Q> clampByteValue 365
+> clampByteValue 365
 255
-Q> clampByteValue (-255)
+> clampByteValue (-255)
 0
-Q> clampByteValue 128
+> clampByteValue 128
 128
 ```
 
@@ -503,20 +507,20 @@ as an operator like `-` would behave differently depending on which side you are
 1. Define a function that takes a list of `Int`s and multiplies each with `2`. Remember `map`[0].
 
 ```purescript
-Q> multiplyAllByTwo [1, 2, 3]
+> multiplyAllByTwo [1, 2, 3]
 [2, 4, 6]
-Q> multiplyAllByTwo []
+> multiplyAllByTwo []
 []
 ```
 
 2. Define a function that takes a list of `Int`s and squares each. Remember `map`[0].
 
 ```purescript
-Q> squareAll [1, 2, 3]
+> squareAll [1, 2, 3]
 [1, 4, 9]
-Q> squareAll []
+> squareAll []
 []
-Q> squareAll [-1, -2, -3]
+> squareAll [-1, -2, -3]
 [1, 4, 9]
 ```
 
@@ -526,9 +530,9 @@ Q> squareAll [-1, -2, -3]
    application both with `filter` and when constructing the predicate.
 
 ```purescript
-Q> allZeros [0, 1, 0, 2, 0, 3]
+> allZeros [0, 1, 0, 2, 0, 3]
 [0, 0, 0]
-Q> allZeros [1..9]
+> allZeros [1..9]
 []
 ```
 
@@ -536,9 +540,9 @@ Q> allZeros [1..9]
    both the predicate and `filter`.
 
 ```purescript
-Q> numbersAboveZero [0, 1, 0, 2, 0, 3]
+> numbersAboveZero [0, 1, 0, 2, 0, 3]
 [1, 2, 3]
-Q> numbersAboveZero [1..9]
+> numbersAboveZero [1..9]
 [1, 2, 3, 4, 5, 6, 7, 8, 9]
 ```
 
@@ -547,11 +551,11 @@ Q> numbersAboveZero [1..9]
    `takeWhile`[2] and the predicate you pass to it.
 
 ```purescript
-Q> takeBelow10 [5..15]
+> takeBelow10 [5..15]
 [5, 6, 7, 8, 9]
-Q> takeBelow10 [1..9]
+> takeBelow10 [1..9]
 [1, 2, 3, 4, 5, 6, 7, 8, 9]
-Q> takeBelow10 []
+> takeBelow10 []
 []
 ```
 
@@ -559,11 +563,11 @@ Q> takeBelow10 []
    out how and use partial application for your definition.
 
 ```purescript
-Q> areAllEven [2, 4..10]
+> areAllEven [2, 4..10]
 True
-Q> areAllEven [1..9]
+> areAllEven [1..9]
 False
-Q> areAllEven []
+> areAllEven []
 True
 ```
 
@@ -589,12 +593,12 @@ import Prelude
 -- `/=` is the "not equal" operator in Haskell, analogous to `!=` in many other languages.
 -- Note how we're again using an operator with only one argument, and are missing the left-most one,
 -- which gives us a function expecting one argument, which is exactly what the predicate we pass to
--- `takeWhile` here expects: `Char -> Bool`
+-- `takeWhile` here expects: `Char -> Boolean`
 
 -- Types for this example:
 --
 -- reverse :: String -> String
--- takeWhile :: (Char -> Bool) -> String -> String
+-- takeWhile :: (Char -> Boolean) -> String -> String
 -- length :: String -> Int
 
 dataPartLength :: String -> Int
@@ -643,7 +647,7 @@ Let's first look at the given example numbers in action:
 import Data.Function ((&))
 import Prelude
 
-isDivisibleBy :: Int -> Int -> Bool
+isDivisibleBy :: Int -> Int -> Boolean
 isDivisibleBy x divisor =
   -- Note how we surround the function in backticks (`) to be able to put it in the infix position.
   let remainderOfDivision = x `rem` divisor
@@ -660,7 +664,7 @@ We can use a shorthand plus `takeWhile` to make this a bit neater:
 import Data.Function ((&))
 import Prelude
 
-isDivisibleBy :: Int -> Int -> Bool
+isDivisibleBy :: Int -> Int -> Boolean
 isDivisibleBy x divisor =
   -- Note how we surround the function in backticks (`) to be able to put it in the infix position.
   let remainderOfDivision = x `rem` divisor
@@ -679,7 +683,7 @@ If we now set an upper bound as a parameter we can get the solution to the actua
 import Data.Function ((&))
 import Prelude
 
-isDivisibleBy :: Int -> Int -> Bool
+isDivisibleBy :: Int -> Int -> Boolean
 isDivisibleBy x divisor =
   -- Note how we surround the function in backticks (`) to be able to put it in the infix position.
   let remainderOfDivision = x `rem` divisor
@@ -700,7 +704,7 @@ If we wanted to support using different divisors we could also do the following:
 import Data.Function ((&))
 import Prelude
 
-isDivisibleBy :: Int -> Int -> Bool
+isDivisibleBy :: Int -> Int -> Boolean
 isDivisibleBy x divisor =
   -- Note how we surround the function in backticks (`) to be able to put it in the infix position.
   let remainderOfDivision = x `rem` divisor
@@ -726,13 +730,13 @@ solution upperBound divisors =
    - an unnamed argument; with `>>>`
 
 ```purescript
-Q> multipliedEvenSum [2, 4..10]
+> multipliedEvenSum [2, 4..10]
 60
-Q> multipliedEvenSum [1..9]
+> multipliedEvenSum [1..9]
 40
-Q> multipliedEvenSum []
+> multipliedEvenSum []
 0
-Q> multipliedEvenSum [1, 3..9]
+> multipliedEvenSum [1, 3..9]
 0
 ```
 
@@ -743,11 +747,11 @@ Q> multipliedEvenSum [1, 3..9]
    - an unnamed argument; with `>>>`
 
 ```purescript
-Q> isSumOfMultipliedLeadingEvensEven [2, 4..10]
+> isSumOfMultipliedLeadingEvensEven [2, 4..10]
 True
-Q> isSumOfMultipliedLeadingEvensEven [2, 4, 5, 6]
+> isSumOfMultipliedLeadingEvensEven [2, 4, 5, 6]
 True
-Q> isSumOfMultipliedLeadingEvensEven []
+> isSumOfMultipliedLeadingEvensEven []
 True
 ```
 
@@ -755,11 +759,11 @@ True
    notes as inspiration.
 
 ```purescript
-Q> averageOfLast3 [2, 4..10]
+> averageOfLast3 [2, 4..10]
 8.0
-Q> averageOfLast3 [2, 4, 5, 6]
+> averageOfLast3 [2, 4, 5, 6]
 5.0
-Q> averageOfLast3 []
+> averageOfLast3 []
 0.0
 ```
 
@@ -770,11 +774,11 @@ Q> averageOfLast3 []
    from that to a partially applied function.
 
 ```purescript
-Q> headingNames ["# Functions", "## Pipelines using partial application", "Random text"]
+> headingNames ["# Functions", "## Pipelines using partial application", "Random text"]
 [ "Functions"
 , "Pipelines using partial application"
 ]
-Q> headingNames []
+> headingNames []
 []
 ```
 
