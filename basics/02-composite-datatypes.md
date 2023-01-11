@@ -1312,7 +1312,24 @@ constructor and the individual fields/components can in many cases be very illum
 
 ### Array
 
-<!-- @TODO: section about arrays -->
+Arrays in PureScript are just like arrays we find in JavaScript or similar languages. They are
+constructed with `[]` and must contain values of the same type. If we want to work with arrays we
+will generally import things from the `Data.Array` module.
+
+One interesting note about arrays is that they do not provide any pattern matching except on exact
+patterns of a known size. This means that the following works:
+
+```purescript
+firstAndSecond :: Array Int -> Maybe (Int, Int)
+firstAndSecond [x, y] = Just (x, y)
+firstAndSecond _ = Nothing
+```
+
+We are unable to pattern match on the first item and then any kind of rest argument, which means
+that we can't write patterns that will work as long as there is a first item, for example, because
+we'd have to have a literal pattern for all combinations of the rest of the array.
+
+If we want to pattern match in this way on a sequence of items we can use `List` instead.
 
 ### List
 
