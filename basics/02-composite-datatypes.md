@@ -1,12 +1,12 @@
 # Composite datatypes
 
 - [Composite datatypes](#composite-datatypes)
-  - [Bool](#bool)
-    - [`if` and `Bool`](#if-and-bool)
+  - [Boolean](#boolean)
+    - [`if` and `Boolean`](#if-and-boolean)
     - [`case` for pattern matching on datatypes](#case-for-pattern-matching-on-datatypes)
     - [Top-level pattern matching](#top-level-pattern-matching)
-    - [Exercises (Bool)](#exercises-bool)
-  - [Interlude: `deriving (Eq, Show)`](#interlude-deriving-eq-show)
+    - [Exercises (Boolean)](#exercises-boolean)
+  - [Interlude: Deriving `Eq` and `Show`](#interlude-deriving-eq-and-show)
   - [Newtypes](#newtypes)
     - [Exercises (Newtypes)](#exercises-newtypes)
   - [Record types](#record-types)
@@ -28,38 +28,29 @@
       - [Exercises (Either)](#exercises-either)
         - [Exercise notes (Either)](#exercise-notes-either)
     - [Tuples](#tuples)
-    - [List / []](#list--)
+    - [Array](#array)
+    - [List](#list)
       - [Exercises (Lists)](#exercises-lists)
         - [Exercise notes (Lists)](#exercise-notes-lists)
   - [Strictness annotations](#strictness-annotations)
-    - [Lists and lazyness](#lists-and-lazyness)
-    - [More tools for strictness](#more-tools-for-strictness)
-    - [More extensive material on lazyness](#more-extensive-material-on-lazyness)
 
 Not everything is just a primitive, of course, and we've actually already seen an example of a more
-complex datatype in the previous chapter about "Values and functions": `Bool`.
+complex datatype in the previous chapter about "Values and functions": `Boolean`.
 
-## Bool
+## Boolean
 
-`Bool` is actually defined exactly as we would define one of our own types:
+`Boolean`, despite having the constructors `true` and `false` is actually defined exactly as we
+one of the simplest composite datatypes that we have access to:
 
-```haskell
--- After the `data` keyword comes the name of the type. This is how we would refer to it in a type
--- signature.
-data Bool = True | False
--- ^ These are the valid ways of constructing a `Bool`, either with `True` or `False`.
--- Constructors are always, like types, written with an initial uppercase letter.
-```
+It can be either `true` or `false` and working with it is fairly instructive in terms of how one can
+work with these kinds of data definitions.
 
-It can be either `True` or `False` and working with it is fairly instructive in terms of how one can
-work with these kinds of data declarations.
+### `if` and `Boolean`
 
-### `if` and `Bool`
-
-```haskell
+```purescript
 import Prelude
 
-add42or1337 :: Bool -> Int -> Int
+add42or1337 :: Boolean -> Int -> Int
 -- Note that `if` is an expression and both branches need to return the same type. We also always
 -- need the `else` branch for this reason.
 add42or1337 shouldAdd42 x = x + if shouldAdd42 then 42 else 1337
@@ -68,108 +59,108 @@ add42or1337 shouldAdd42 x = x + if shouldAdd42 then 42 else 1337
 ### `case` for pattern matching on datatypes
 
 We could also use pattern-matching via the `case` keyword here to inspect the value of the bool.
-This isn't something that only works for `Bool`, but rather something we can use for all datatype
+This isn't something that only works for `Boolean`, but rather something we can use for all datatype
 definitions. When we pattern-match on them we can use the constructors of the datatypes to
 deconstruct the information. Matches are tried from top to bottom, so if the boolean value in the
-below example was `True`, we would add `42` to our integer value and if it was `False`, we would
+below example was `true`, we would add `42` to our integer value and if it was `false`, we would
 add `1337`. If we didn't handle both cases here we would get a warning from the compiler:
 
-```haskell
+```purescript
 import Prelude
 
-add42or1337 :: Bool -> Int -> Int
+add42or1337 :: Boolean -> Int -> Int
 add42or1337 shouldAdd42 x = x + case shouldAdd42 of
-  True -> 42
-  False -> 1337
+  true -> 42
+  false -> 1337
 ```
 
-Each `case` branch can deconstruct the different constructors of a union type (which `Bool` is),
+Each `case` branch can deconstruct the different constructors of a union type (which `Boolean` is),
 even if they have associated data in them. We'll see this later.
 
 ### Top-level pattern matching
 
 We could also pattern-match "in the top-level", meaning on the left of the `=`. The same rules as
 for `case` apply here; we need to cover both cases or the compiler will tell us the pattern-match is
-not exhaustive. The cases are tried in order and here we are saying that if the first value (`Bool`)
-is `True` we (again) add 42, etc.:
+not exhaustive. The cases are tried in order and here we are saying that if the first value (`Boolean`)
+is `true` we (again) add 42, etc.:
 
-```haskell
+```purescript
 import Prelude
 
-add42or1337 :: Bool -> Int -> Int
-add42or1337 True x = x + 42
-add42or1337 False x = x + 1337
+add42or1337 :: Boolean -> Int -> Int
+add42or1337 true x = x + 42
+add42or1337 false x = x + 1337
 ```
 
 If the logic for a function differs a lot between the cases I would personally prefer the last
 version as it also allows you to have some of the arguments be bound only for certain cases, etc.,
 and generally keeps each case separate. In this case the first version makes the most sense because
 only the amount added depends on the boolean and we have special syntax for boolean values with
-`if`. `Bool` values also work naturally with `if`.
+`if`. `Boolean` values also work naturally with `if`.
 
-### Exercises (Bool)
+### Exercises (Boolean)
 
-1. Create a function `and` that takes two `Bool`s and returns `True` if both are true, `False`
+1. Create a function `and` that takes two `Boolean`s and returns `true` if both are true, `false`
    otherwise. Define versions using:
-   - `case` (`case (firstBool, secondBool)` will allow you to match on both at the same time)
+   - `case` (`case (firstBoolean, secondBoolean)` will allow you to match on both at the same time)
    - Top-level pattern-matching
 
-```haskell
-Q> and True True
-True
-Q> and False True
-False
-Q> and True False
-False
+```purescript
+Q> and true true
+true
+Q> and false true
+false
+Q> and true false
+false
 ```
 
-2. Create a function `or` that takes two `Bool`s and returns `True` if either is true, `False`
+2. Create a function `or` that takes two `Boolean`s and returns `true` if either is true, `false`
    otherwise. Define versions using:
-   - `case` (`case (firstBool, secondBool)` will allow you to match on both at the same time)
+   - `case` (`case (firstBoolean, secondBoolean)` will allow you to match on both at the same time)
    - Top-level pattern-matching
 
-```haskell
-Q> or False True
-True
-Q> or True False
-True
-Q> or True True
-True
-Q> or False False
-False
+```purescript
+Q> or false true
+true
+Q> or true false
+true
+Q> or true true
+true
+Q> or false false
+false
 ```
 
-3. Create a function `exclusiveOr` that takes two `Bool`s and returns true if exactly one of them
+3. Create a function `exclusiveOr` that takes two `Boolean`s and returns true if exactly one of them
    is true. Define versions using:
-   - `case` (`case (firstBool, secondBool)` will allow you to match on both at the same time)
+   - `case` (`case (firstBoolean, secondBoolean)` will allow you to match on both at the same time)
    - Top-level pattern-matching
 
-```haskell
-Q> exclusiveOr False True
-True
-Q> exclusiveOr True False
-True
-Q> exclusiveOr True True
-False
-Q> exclusiveOr False False
-False
+```purescript
+Q> exclusiveOr false true
+true
+Q> exclusiveOr true false
+true
+Q> exclusiveOr true true
+false
+Q> exclusiveOr false false
+false
 ```
 
-4. Create a function `bool` that takes two parameters of the type `Int` as well as a `Bool` and
-   returns the first one if the `Bool` is `True` and the other if it's `False`.
+4. Create a function `bool` that takes two parameters of the type `Int` as well as a `Boolean` and
+   returns the first one if the `Boolean` is `true` and the other if it's `false`.
    Define versions using:
    - `case`
    - `if`
    - Top-level pattern-matching
 
-```haskell
-Q> bool 42 1337 True
+```purescript
+Q> bool 42 1337 true
 42
-Q> bool 42 1337 False
+Q> bool 42 1337 false
 1337
 ```
 
-## Interlude: `deriving (Eq, Show)`
+## Interlude: Deriving `Eq` and `Show`
 
 In these examples you'll often find that there is a line under a lot of data definitions reading
 `deriving (Eq, Show)`. We'll look at what `deriving` and the other components to this mean in the
@@ -179,7 +170,7 @@ for value.
 
 ## Newtypes
 
-Before we move into advanced composite types, let's look at a very basic tool in the Haskell
+Before we move into advanced composite types, let's look at a very basic tool in the PureScript
 toolbelt: `newtype`.
 
 Newtypes are types that wrap other types in order to make distinct versions of them. Let's look at
@@ -188,13 +179,13 @@ what that means in practice.
 Let's imagine a function `filteredCopy` that takes a source filename, destination filename as well
 as a string to filter by such that we only copy lines that contain that string:
 
-```haskell
-filteredCopy :: String -> String -> String -> IO ()
+```purescript
+filteredCopy :: String -> String -> String -> Effect Unit
 filteredCopy source destination copyPattern = ...
 ```
 
-(**Note**: The `IO ()` for the purposes of this example means that we are doing something effectful
-and there is no useful return value. We will go over this in the next chapter.)
+(**Note**: The `Effect Unit`, for the purposes of this example, means that we are doing something
+effectful and there is no useful return value. We will go over this in the next chapter.)
 
 Since the arguments to this function are all strings, what happens if we by mistake use this
 function with `filteredCopy destination source copyPattern` or any other incorrect order for the
@@ -202,7 +193,7 @@ parameters? The type system doesn't know anything about what these strings repre
 
 The solution to this issue is fairly simple:
 
-```haskell
+```purescript
 --       type    constructor
 newtype Source = Source String
 -- ^ This constructor, `Source`, takes one argument, a `String`.
@@ -217,7 +208,7 @@ newtype Destination = Destination String
 newtype CopyPattern = CopyPattern String
   deriving (Eq, Show)
 
-filteredCopy :: Source -> Destination -> CopyPattern -> IO ()
+filteredCopy :: Source -> Destination -> CopyPattern -> Effect Unit
 filteredCopy (Source source) (Destination destination) (CopyPattern copyPattern) = ...
 -- ^ Note how we can deconstruct these wrappers just like with other forms of data definitions. This
 -- is a very useful thing to do when we effectively want to be working with the strings that these
@@ -227,7 +218,7 @@ filteredCopy (Source source) (Destination destination) (CopyPattern copyPattern)
 
 When we use `filteredCopy` now we will have to wrap our strings:
 
-```haskell
+```purescript
 filteredCopy (Source source) (Destination destination) (CopyPattern copyPattern)
 ```
 
@@ -237,18 +228,18 @@ it's much easier to spot this mistake and if a value is produced in one place in
 
 ### Exercises (Newtypes)
 
-1. Define a newtype that wraps `Float`, called `Meters`. Define a function `addMeters`that takes two
+1. Define a newtype that wraps `Number`, called `Meters`. Define a function `addMeters`that takes two
    `Meters` and adds them together to return a new `Meters`.
 
-```haskell
+```purescript
 Q> addMeters (Meters 2.5) (Meters 3.0)
 Meters 5.5
 ```
 
-2. Define two newtypes wrapping `Float`, called `Meters` and `Kilometers`. Define a function that
+2. Define two newtypes wrapping `Number`, called `Meters` and `Kilometers`. Define a function that
    takes `Meters` and correctly converts them into `Kilometers`.
 
-```haskell
+```purescript
 Q> metersToKilometers (Meters 1050.0)
 Kilometers 1.05
 ```
@@ -256,7 +247,7 @@ Kilometers 1.05
 3. Define a newtype wrapping `String` that is called `Username`, then a function that takes a
    `Username` and returns its length.
 
-```haskell
+```purescript
 Q> usernameLength (Username "pesho")
 5
 ```
@@ -264,76 +255,42 @@ Q> usernameLength (Username "pesho")
 ## Record types
 
 Records are useful when we want to store multiple values together in a named structure. The
-individual parts, or "fields", are named as well. We begin a record definition with the keyword
-`data` after which we give the name of the type. Following an `=` we then give the constructor for
-the type; a function that takes the record data and constructs the type.
+individual parts, or "fields", are named as well. The simplest definition of a record is a type
+alias that simply describes the structure of the record:
 
-```haskell
---      type       constructor
-data UserProfile = UserProfile
-  { username :: String,
-    age :: Int,
-    active :: Bool,
-    interests :: [String]
+```purescript
+type UserProfile = 
+  { username :: String
+  , age :: Int
+  , active :: Boolean
+  , interests :: Array String
   }
-  deriving (Eq, Show)
+```
+
+As aliases are not actually distinguished from other types themselves, we can distinguish this
+specific record type from another by using `newtype`:
+
+```purescript
+newtype UserProfile = UserProfile
+  { username :: String
+  , age :: Int
+  , active :: Boolean
+  , interests :: Array String
+  }
 ```
 
 The constructor name can be different than the type name, but this is comparatively rare.
 
-One thing to note about record definitions in Haskell is that each field will have an associated
-function that takes the type and returns the field. Let's use the `:type` command in our interactive
-session to find out the type of each of these generated functions:
-
-```haskell
-Q> :type username
-username :: UserProfile -> String
-Q> :type age
-age :: UserProfile -> Int
-Q> :type active
-active :: UserProfile -> Bool
-Q> :type interests
-interests :: UserProfile -> [String]
-Q> rickard = UserProfile {
-     username = "rickard",
-     age = 34,
-     active = True,
-     interests = ["Programming", "Problem Solving", "Teaching"]
-   }
-Q> rickard
-UserProfile
-    { username = "rickard"
-    , age = 34
-    , active = True
-    , interests =
-        [ "Programming"
-        , "Problem Solving"
-        , "Teaching"
-        ]
-    }
-Q> username rickard
-"rickard"
-Q> age rickard
-34
-Q> active rickard
-True
-Q> interests rickard
-[ "Programming"
-, "Problem Solving"
-, "Teaching"
-]
-```
-
 We can see this in action in this snippet where we turn a profile into a string:
 
-```haskell
+```purescript
 profileToString :: UserProfile -> String
 profileToString profile =
   let ageString = show $ age profile
       activeString = if active profile then "active" else "not active"
       interestsString = intercalate ", " (interests profile)
-   -- `mconcat` here concatenates a list of strings into a string
-   in mconcat
+   -- `fold` here concatenates a list of strings into a string
+   in fold
         [ username profile,
           " (",
           ageString,
@@ -344,21 +301,21 @@ profileToString profile =
         ]
 
 -- | Inserts a given string between every entry in the list of strings
-intercalate :: String -> [String] -> String
+intercalate :: String -> Array String -> String
 intercalate between strings =
-  mconcat $ List.intersperse between strings
+  fold $ Array.intersperse between strings
 ```
 
 Running this on our previously defined profile we get:
 
-```haskell
+```purescript
 Q> profileToString rickard
 "rickard (34y, active) is interested in: Programming, Problem Solving, Teaching"
 ```
 
 We could also pattern match on our `UserProfile` type:
 
-```haskell
+```purescript
 profileToString' :: UserProfile -> String
 profileToString'
   UserProfile
@@ -381,9 +338,9 @@ profileToString'
         ]
 
 -- | Inserts a given string between every entry in the list of strings
-intercalate :: String -> [String] -> String
+intercalate :: String -> Array String -> String
 intercalate between strings =
-  mconcat $ List.intersperse between strings
+  mconcat $ Array.intersperse between strings
 ```
 
 We can see that we've now bound the values we care about in our function definition "head" and so
@@ -393,7 +350,7 @@ forced to spread it out over several lines, and we are repeating the field and v
 unnecessarily. When we are using the same name for a field we are matching as the name we are
 binding it to, we can use this nice shorthand:
 
-```haskell
+```purescript
 profileToString :: UserProfile -> String
 profileToString UserProfile {username, age, active, interests} =
   let ageString = show age
@@ -410,21 +367,21 @@ profileToString UserProfile {username, age, active, interests} =
         ]
 
 -- | Inserts a given string between every entry in the list of strings
-intercalate :: String -> [String] -> String
+intercalate :: String -> Array String -> String
 intercalate between strings =
-  mconcat $ List.intersperse between strings
+  mconcat $ Array.intersperse between strings
 ```
 
 If we omit the `=` in our bindings Haskell will assume we are binding the fields into a name equal
 to the field's name. This mirrors the behavior you can find in, for example, JavaScript and other
 languages and also applies when we construct records:
 
-```haskell
+```purescript
 let userProfile =
       -- Note how we don't have to pass all of these without `=`
       UserProfile {username = "rickard", age, active, interests}
     age = 34
-    active = True
+    active = true
     interests = ["Programming" , "Problem Solving" , "Teaching"]
 ```
 
@@ -443,7 +400,7 @@ project-name quanterall/{basic,application,web-postgres}`.)
 1. Define a function that takes a `String` and returns a datatype that stores both the length of the
    string and the string itself.
 
-```haskell
+```purescript
 Q> stringAndLength "hello"
 StringAndLength
     { lengthOfString = 5
@@ -455,7 +412,7 @@ StringAndLength
    (`Double` between 0 and 1). Define a function taking this type that calculates the total price of
    a product.
 
-```haskell
+```purescript
 Q> totalPrice Product {name = "Bio Cucumber", price = 5, taxationRate = 0.2}
 6.0
 Q> totalPrice Product {name = "Bio Cucumber", price = 5, taxationRate = 0.1}
@@ -477,12 +434,12 @@ Q> totalPrice Product {name = "Normal Cucumber", price = 1, taxationRate = 0.1}
 
 While a record represents a collection of values that make up a whole, all of them present, a
 **union type** represents a set of alternatives that are all valid, but only one at a time. The
-built-in `Bool` type is a union type; we can only have either `True` **or** `False`.
+built-in `Boolean` type is a union type; we can only have either `true` **or** `false`.
 
 We define a union type with the `data` keyword followed by the type name and `=`. Then we list the
 **constructors** of the type with `|` between them:
 
-```haskell
+```purescript
 -- This requires you to add `time` as a dependency in `package.yaml`
 import Data.Time (Day)
 import Prelude
@@ -506,28 +463,28 @@ profile. For the subsequent cases the constructors don't carry any additional da
 
 We can inspect and act on this data in several ways:
 
-```haskell
+```purescript
 -- Note how we can put an underscore alone or before some text here to say that we do not care what
 -- the contents actually are, but we are saying that yes, there is a value there.
-isSingle :: RelationshipStatus -> Bool
-isSingle (MarriedTo _) = False
-isSingle (EngagedTo _userProfile) = False
-isSingle ItsComplicated = True
-isSingle Single = True
+isSingle :: RelationshipStatus -> Boolean
+isSingle (MarriedTo _) = false
+isSingle (EngagedTo _userProfile) = false
+isSingle ItsComplicated = true
+isSingle Single = true
 
-isSingle' :: RelationshipStatus -> Bool
+isSingle' :: RelationshipStatus -> Boolean
 isSingle' status = case status of
-  MarriedTo _marriageInfo -> False
-  EngagedTo _ -> False
-  ItsComplicated -> True
-  Single -> True
+  MarriedTo _marriageInfo -> false
+  EngagedTo _ -> false
+  ItsComplicated -> true
+  Single -> true
 ```
 
 The above functions are of course very course grained; it's a very binary thing. To accurately
 represent what is actually the case we sometimes need to introduce more choices. Let's define a type
 that is perhaps more accurate:
 
-```haskell
+```purescript
 data IsSingle
   = DefinitelySingle
   | MaybeSingle
@@ -557,20 +514,20 @@ type.
 
 ### Exercises (Union types)
 
-1. Define a function that takes a default `Float` value as well as a `DivisionResult` and if
+1. Define a function that takes a default `Number` value as well as a `DivisionResult` and if
    the division result is a division by zero, returns the default. Otherwise it returns the result.
    Create a solution with top-level pattern matching as well as one with `case`.
 
    Remember that a `DivisionResult` looks as follows:
 
-```haskell
+```purescript
 data DivisionResult
-  = DivideSuccess Float
+  = DivideSuccess Number
   | DivisionByZero
   deriving (Show)
 ```
 
-```haskell
+```purescript
 Q> divisionOrDefault 42 DivisionByZero 
 42.0
 Q> divisionOrDefault 42 (DivideSuccess 1337) 
@@ -583,7 +540,7 @@ Q> divisionOrDefault 42 (DivideSuccess 1337)
 
    Remember that `RelationshipStatus` looks as follows:
 
-```haskell
+```purescript
 -- This requires you to add `time` as a dependency in `package.yaml`
 import Data.Time (Day)
 import Prelude
@@ -621,19 +578,19 @@ data MarriageInfo = MarriageInfo {spouse :: String, date :: Day}
    `correspondingOrderType` that takes a `TradeOrder` and returns a `SellOrder` if a `BuyOrder`
    has been passed to it and vice versa.
 
-```haskell
+```purescript
 Q> correspondingOrderType (BuyOrder (TickerSymbol "MSFT") 1000)
 SellOrder ( TickerSymbol "MSFT" ) 1000
 Q> correspondingOrderType (SellOrder (TickerSymbol "MSFT") 1000)
 BuyOrder ( TickerSymbol "MSFT" ) 1000
 ```
 
-6. Define a function `matchOrder` that takes a `TradeOrder` and a `[TradeOrder]` and returns
+6. Define a function `matchOrder` that takes a `TradeOrder` and an `Arary TradeOrder` and returns
    whether or not we matched a sell/trade to an existing opposite trade/sell in the list of orders.
    If there is a match, return the matching entry as well as the list of trade orders **without**
    the matched order[1]. If there is no match, indicate this in the return value.
 
-```haskell
+```purescript
 Q> orders = [BuyOrder (TickerSymbol "AAPL") 1050, SellOrder (TickerSymbol "MSFT") 1000]
 Q> matchOrder (BuyOrder (TickerSymbol "MSFT") 1000) orders
 MatchedOrder
@@ -659,17 +616,17 @@ As we saw in the previous section it's trivial to combine records and unions; ou
 type is already embedded in the `MarriedTo` constructor. So let's take that one step further and
 enrich our `UserProfile` data type by adding our `RelationshipStatus` to `UserProfile`:
 
-```haskell
+```purescript
 import qualified Data.List as List
 import Data.Time (Day)
 import qualified Data.Time as Time
 import Prelude
 
-data UserProfile = UserProfile
+newtype UserProfile = UserProfile
   { username :: String,
     age :: Int,
-    active :: Bool,
-    interests :: [String],
+    active :: Boolean,
+    interests :: Array String,
     relationshipStatus :: RelationshipStatus
   }
   deriving (Eq, Show)
@@ -692,7 +649,7 @@ profileToString UserProfile {age, active, interests, relationshipStatus, usernam
       relationshipStatusString = case relationshipStatus of
         MarriedTo MarriageInfo {spouse, date} ->
           let dateString = Time.showGregorian date
-           in -- `unwords` takes a `[String]` and joins them into a string with spaces inbetween
+           in -- `unwords` takes an `Arry String` and joins them into a string with spaces inbetween
               unwords ["Married to:", spouse, "on", dateString]
         EngagedTo UserProfile {username = spouseUsername} ->
           unwords ["Engaged to:", spouseUsername]
@@ -711,18 +668,18 @@ profileToString UserProfile {age, active, interests, relationshipStatus, usernam
         ]
 
 -- | Inserts a given string between every entry in the list of strings
-intercalate :: String -> [String] -> String
+intercalate :: String -> Array String -> String
 intercalate between strings =
-  mconcat $ List.intersperse between strings
+  mconcat $ Array.intersperse between strings
 ```
 
 If we now construct our `rickard` profile with this in mind we get the following:
 
-```haskell
+```purescript
 Q> rickard = UserProfile {
      username = "rickard",
      age = 34,
-     active = True,
+     active = true,
      interests = ["Programming", "Problem Solving", "Teaching"],
      relationshipStatus = MarriedTo MarriageInfo {
        spouse = "Ivana",
@@ -744,7 +701,7 @@ require users on our site to only be able to set their "married" status if their
 site. However, if we instead make the `spouse` field take a type that allows us to have a name
 **or** a userprofile, we can express this possibility clearly:
 
-```haskell
+```purescript
 -- Our `MarriageInfo` record now takes a `Spouse` type, which itself is a more
 -- expressive type allowing for either a string or a user profile
 data MarriageInfo = MarriageInfo {spouse :: Spouse, date :: Day}
@@ -758,11 +715,11 @@ data Spouse
 
 This will give us the same capability as before, because we still support spouse names with strings:
 
-```haskell
+```purescript
 Q> rickard = UserProfile {
      username = "rickard",
      age = 34,
-     active = True,
+     active = true,
      interests = ["Programming", "Problem Solving", "Teaching"],
      relationshipStatus = MarriedTo MarriageInfo {
        spouse = SpouseName "Ivana",
@@ -776,11 +733,11 @@ Solving, Teaching"
 
 But we can now also use a user profile in our `spouse` field:
 
-```haskell
+```purescript
 Q> ivana = UserProfile {
      username = "ivana",
      age = 31,
-     active = True,
+     active = true,
      interests = ["Web Design", "Cats", "Beer"],
      relationshipStatus = MarriedTo MarriageInfo {
        spouse = SpouseProfile rickard,
@@ -797,9 +754,6 @@ could use the fact that we are guaranteed to have another `UserProfile` in the `
 to insert a link to the other profile in this case and only output a string with the name in the
 other.
 
-For another example of modelling (part of) a domain with types, see
-[this file](./02b-person-printing.md).
-
 ### Exercises (Combining records and unions)
 
 1. Modify the `profileToString` function[0] to take into account that our `spouse` name in
@@ -813,7 +767,7 @@ For another example of modelling (part of) a domain with types, see
 
 0. The code for `profileToString` and its associated types:
 
-```haskell
+```purescript
 import qualified Data.List as List
 import Data.Time (Day)
 import qualified Data.Time as Time
@@ -822,8 +776,8 @@ import Prelude
 data UserProfile = UserProfile
   { username :: String,
     age :: Int,
-    active :: Bool,
-    interests :: [String],
+    active :: Boolean,
+    interests :: Array String,
     relationshipStatus :: RelationshipStatus
   }
   deriving (Eq, Show)
@@ -851,7 +805,7 @@ profileToString UserProfile {age, active, interests, relationshipStatus, usernam
       relationshipStatusString = case relationshipStatus of
         MarriedTo MarriageInfo {spouse, date} ->
           let dateString = Time.showGregorian date
-           in -- `unwords` takes a `[String]` and joins them into a string with spaces inbetween
+           in -- `unwords` takes an `Array String` and joins them into a string with spaces inbetween
               unwords ["Married to:", spouse, "on", dateString]
         EngagedTo UserProfile {username = spouseUsername} ->
           unwords ["Engaged to:", spouseUsername]
@@ -870,9 +824,9 @@ profileToString UserProfile {age, active, interests, relationshipStatus, usernam
         ]
 
 -- | Inserts a given string between every entry in the list of strings
-intercalate :: String -> [String] -> String
+intercalate :: String -> Array String -> String
 intercalate between strings =
-  mconcat $ List.intersperse between strings
+  mconcat $ Array.intersperse between strings
 ```
 
 ## Generic datatypes
@@ -886,7 +840,7 @@ type `String`, as well as another usage has `Char` and `Int` instead. For this p
 
 The most basic generic datatype is a type that can hold anything and that has only one constructor:
 
-```haskell
+```purescript
 data Holder a = Holder a
   deriving (Eq, Show)
 ```
@@ -903,10 +857,10 @@ versions of them.
 
 If we were to define a generic record, for example, we could just do the following:
 
-```haskell
+```purescript
 data HttpResponse a = HttpResponse
   { status :: HttpStatus,
-    headers :: [HttpHeader],
+    headers :: Array HttpHeader,
     body :: a
   }
   deriving (Eq, Show)
@@ -933,44 +887,44 @@ or `HttpResponse UTF8Text`.
 
 If we had these different applications of  `HttpResponse`, they would look as follows:
 
-```haskell
+```purescript
 -- `HttpResponse String`
 HttpResponse
   { status :: HttpStatus,
-    headers :: [HttpHeader],
+    headers :: Array HttpHeader,
     body :: String
   }
 
 -- `HttpResponse JSONValue`
 HttpResponse
   { status :: HttpStatus,
-    headers :: [HttpHeader],
+    headers :: Array HttpHeader,
     body :: JSONValue
   }
 
 -- `HttpResponse ByteString`
 HttpResponse
   { status :: HttpStatus,
-    headers :: [HttpHeader],
+    headers :: Array HttpHeader,
     body :: ByteString
   }
 
 -- `HttpResponse UTF8Text`
 HttpResponse
   { status :: HttpStatus,
-    headers :: [HttpHeader],
+    headers :: Array HttpHeader,
     body :: UTF8Text
   }
 ```
 
 With unions we predictably have the same format for generic unions as we do for basic ones:
 
-```haskell
+```purescript
 data SomeAmountOf a
   = None
   | One a
   | CoupleOf a a
-  | BunchOf a a [a]
+  | BunchOf a a (Array a)
   deriving (Eq, Show)
 
 none :: SomeAmountOf Int
@@ -991,7 +945,7 @@ bunchOf = BunchOf 42 1337 [1, 2, 3]
 1. Define a value of type `Holder Int` as well as a value of type `Holder String`. Remember that the
    definition of `Holder` looks as follows:
 
-```haskell
+```purescript
 data Holder a = Holder a
   deriving (Eq, Show)
 ```
@@ -999,7 +953,7 @@ data Holder a = Holder a
 2. Define a function `pureHolder :: a -> Holder a`. Knowing what you know about partial
    application, what is the most concise and direct definition you can come up with?
 
-```haskell
+```purescript
 Q> pureHolder 42
 Holder 42
 Q> pureHolder "hello"
@@ -1009,7 +963,7 @@ Holder "hello"
 3. Define a function `foldHolder :: (a -> b) -> Holder a -> b`. What is the most natural way to
    implement this function?
 
-```haskell
+```purescript
 Q> foldHolder (+ 1) (Holder 42)
 43
 Q> foldHolder length (Holder "hello")
@@ -1019,10 +973,10 @@ Q> foldHolder length (Holder "hello")
 4. Define a function `mapHolder :: (a -> b) -> Holder a -> Holder b` that applies the passed in
    function to the value inside the `Holder` and wraps it up again. After implementing it, try
    creating different concrete types like `Holder Int` and passing matching arguments to the
-   function you wrote. As an example, try passing `length` and a `Holder [Int]` to the function and
-   see what comes out.
+   function you wrote. As an example, try passing `length` and a `Holder (Array Int)` to the
+   function and see what comes out.
 
-```haskell
+```purescript
 Q> mapHolder (+ 1) (Holder 42)
 Holder 43
 Q> mapHolder length (Holder "hello")
@@ -1032,7 +986,7 @@ Holder 5
 5. Define a function `applyHolder :: Holder (a -> b) -> Holder a -> Holder b`. Note how a `Holder`
    is completely flexible in what it will hold.
 
-```haskell
+```purescript
 Q> applyHolder (Holder (+ 1)) (Holder 42)
 Holder 43
 Q> applyHolder (Holder length) (Holder "hello")
@@ -1041,7 +995,7 @@ Holder 5
 
 6. Define a function `bindHolder :: (a -> Holder b) -> Holder a -> Holder b`.
 
-```haskell
+```purescript
 Q> bindHolder (\v -> Holder $ v + 1) (Holder 42)
 Holder 43
 Q> bindHolder (\v -> Holder $ length v) (Holder "hello")
@@ -1058,7 +1012,7 @@ Holder 5
    Don't modify the other functions' type signatures, but rather consider what we can return in
    this new case for each of them.
 
-```haskell
+```purescript
 Q> foldHolder (+ 1) 1337 (Holder 42)
 43
 Q> foldHolder (+ 1) 1337 NoValue
@@ -1088,7 +1042,7 @@ in most Haskell code, so here is an introduction to their definitions and some o
 seen as a `null` type that retains its type even in the presence of nesting. It's defined as
 follows:
 
-```haskell
+```purescript
 data Maybe a
   = Nothing
   | Just a
@@ -1108,7 +1062,7 @@ but this should be done on a case-by-case basis.
 We could for example imagine that a resource is not loaded yet in some data, and this could be
 represented with a `Maybe Resource`, but we could also create the following datatype:
 
-```haskell
+```purescript
 data ResourceLoadStatus
   = NotYetLoaded
   | Loaded Resource
@@ -1123,7 +1077,7 @@ resource, or just want to display "N/A" when it's not loaded.
 
 If we wanted to convert a `ResourceLoadStatus` to a `Maybe Resource`, we could do the following:
 
-```haskell
+```purescript
 data ResourceLoadStatus
   = NotYetLoaded
   | Loaded Resource
@@ -1146,7 +1100,7 @@ resourceLoadStatusToMaybe (Loaded resource) = Just resource
    telephone number, return `"N/A"`. Use pattern matching in the top-level to accomplish this.
 
 <!-- markdownlint-disable MD013 -->
-```haskell
+```purescript
 Q> user = User {username = Username "gonz", email = Email "rickard.andersson@quanterall.com", fullName = Just (FullName "Rickard Andersson"), phone = Just (PhoneNumber "555 363 22 34")}
 Q> showUserPhoneNumber user
 "555 363 22 34"
@@ -1158,7 +1112,7 @@ Q> showUserPhoneNumber userWithoutPhone
 
 3. Define a function `pureMaybe :: a -> Maybe a`.
 
-```haskell
+```purescript
 Q> pureMaybe 5
 Just 5
 Q> pureMaybe "hello"
@@ -1168,7 +1122,7 @@ Just "hello"
 4. Define a function `foldMaybe :: b -> (a -> b) -> Maybe a -> b`. If the `Maybe` has a value, apply
    the function to it. If it doesn't, return the `b` that you take in as an argument.
 
-```haskell
+```purescript
 Q> foldMaybe 1337 (+ 1) (Just 42)
 43
 Q> foldMaybe 1337 (+ 1) Nothing
@@ -1179,7 +1133,7 @@ Q> foldMaybe 1337 (+ 1) Nothing
    the `foldMaybe` function. If the `User` has no telephone number, return `"N/A"`.
 
 <!-- markdownlint-disable MD013 -->
-```haskell
+```purescript
 Q> user = User {username = Username "gonz", email = Email "rickard.andersson@quanterall.com", fullName = Just (Fullname "Rickard Andersson"), phone = Just (PhoneNumber "555 363 22 34")}
 Q> showUserPhoneNumber user
 "555 363 22 34"
@@ -1192,7 +1146,7 @@ Q> showUserPhoneNumber userWithoutPhone
 6. Define a function `mapMaybe :: (a -> b) -> Maybe a -> Maybe b`. Consider what the only things you
    can reasonably do in the cases of `Just x` and `Nothing` are.
 
-```haskell
+```purescript
 Q> mapMaybe (+ 1) (Just 42) 
 Just 43
 Q> mapMaybe length (Just "hello")
@@ -1205,7 +1159,7 @@ Nothing
 
 7. Define a function `applyMaybe :: Maybe (a -> b) -> Maybe a -> Maybe b`.
 
-```haskell
+```purescript
 Q> applyMaybe (Just (+ 1)) (Just 42) 
 Just 43
 Q> applyMaybe (Just length) (Just "hello")
@@ -1222,7 +1176,7 @@ Nothing
 
 8. Define a function `bindMaybe :: (a -> Maybe b) -> Maybe a -> Maybe b`.
 
-```haskell
+```purescript
 Q> bindMaybe (\v -> Just $ v + 1) (Just 42)
 Just 43
 Q> bindMaybe (\v -> Just $ length v) (Just "hello")
@@ -1246,7 +1200,7 @@ or the success case `Right` with success data attached to it. The reason `Left` 
 case is because of how `Either` works in a monadic context. When returning `Left` it is considered
 an error. It's also because `Left` is not right, meaning it's "wrong".
 
-```haskell
+```purescript
 data Either l r
   = Left l
   | Right r
@@ -1259,7 +1213,7 @@ attached.
 
 This, again, can be specialized down to something custom but still retain the same meaning:
 
-```haskell
+```purescript
 data ResourceLoadResult
   = LoadFailure ResourceLoadError
   | LoadSuccess Resource
@@ -1285,7 +1239,7 @@ of our own can be very descriptive.
 
 1. Define a function `foldEither :: (l -> a) -> (r -> a) -> Either l r -> a`.
 
-```haskell
+```purescript
 Q> foldEither length (+ 1) $ Right 42
 43
 Q> foldEither length (+ 1) $ Left "error"
@@ -1294,7 +1248,7 @@ Q> foldEither length (+ 1) $ Left "error"
 
 2. Define a function `pureEither :: a -> Either l a`.
 
-```haskell
+```purescript
 Q> pureEither 42
 Right 42
 ```
@@ -1302,7 +1256,7 @@ Right 42
 3. Define a function `mapEither :: (r -> a) -> Either l r -> Either l a`. Consider what we will have
    to do if we have a `Left`.
 
-```haskell
+```purescript
 Q> mapEither (+ 1) $ Right 42
 Right 43
 Q> mapEither (+ 1) $ Left "error"
@@ -1311,7 +1265,7 @@ Left "error"
 
 4. Define a function `applyEither :: Either l (r -> a) -> Either l r -> Either l a`.
 
-```haskell
+```purescript
 Q> applyEither (Right (+ 1)) $ Right 42
 Right 43
 Q> applyEither (Right (+ 1)) $ Left "error"
@@ -1322,7 +1276,7 @@ Left "other error"
 
 5. Define a function `bindEither :: (r -> Either l a) -> Either l r -> Either l a`.
 
-```haskell
+```purescript
 Q> bindEither (\v -> Right (v + 1)) $ Right 42
 Right 43
 Q> bindEither (\v -> Right (v + 1)) $ Left "error"
@@ -1338,15 +1292,15 @@ Left "error from the function we ran"
 A tuple is an ad-hoc collection of values that can be of different types. Tuples are a staple of
 many so called functional languages and Haskell is no exception:
 
-```haskell
+```purescript
 tuple :: (Int, String)
 tuple = (42, "Forty-Two")
 
-tuple' :: (Int, String, Bool)
-tuple' = (42, "Forty-Two", False)
+tuple' :: (Int, String, Boolean)
+tuple' = (42, "Forty-Two", false)
 
-tuple'' :: (Int, String, Bool, Float)
-tuple'' = (42, "Forty-Two", False, 1337.0)
+tuple'' :: (Int, String, Boolean, Number)
+tuple'' = (42, "Forty-Two", false, 1337.0)
 ```
 
 In many ways a tuple is the same as a record, except we are not naming the different components or
@@ -1356,11 +1310,17 @@ useful. The utility of tuples should be examined on a case-by-case basis to ensu
 make code harder to understand because of their lack of information/context. A name for both a
 constructor and the individual fields/components can in many cases be very illuminating.
 
-### List / []
+### Array
+
+<!-- @TODO: section about arrays -->
+
+### List
+
+<!-- @TODO: rework this section because PureScript does not define `List` the same way -->
 
 `List` / `[]` is interesting because it's defined in terms of operators:
 
-```haskell
+```purescript
 data [] a
   = []
   | a : [a]
@@ -1371,14 +1331,14 @@ empty list, and `:` which as the left argument takes an `a` and as the right arg
 list, `[a]`. This means that a list is effectively the `:` operator applied over and over until it
 is connecting to a `[]`, which marks the end of the list:
 
-```haskell
+```purescript
 Q> 1 : 2 : 3 : 4 : []
 [ 1, 2, 3, 4 ]
 ```
 
 Defined another way we have the following:
 
-```haskell
+```purescript
 data List a
   = EmptyList -- This is commonly called `Nil`
   | Prepend a (List a) -- This is commonly called `Cons`
@@ -1394,7 +1354,7 @@ We've seen many functions so far that have been operating on lists, but we have 
 them with pattern matching. If we want to examine a list in similar ways to our other data we can do
 so using the same tools we would otherwise:
 
-```haskell
+```purescript
 maybeFirstElement :: [a] -> Maybe a
 maybeFirstElement (a : _) = Just a
 maybeFirstElement [] = Nothing
@@ -1429,7 +1389,7 @@ maybeExactlyTwoElements _anyOtherCase = Nothing
    the list. If the sum of the "tail" (rest) is 0 or there are no elements in the list, return
    `Nothing`.
 
-```haskell
+```purescript
 Q> divideBySumOfRestOfList [1, 2, 3]
 Just 0.2
 Q> divideBySumOfRestOfList [1,2,3,4]
@@ -1443,7 +1403,7 @@ Nothing
 2. Define a function that takes a `[a]` and returns a `Maybe [a]` where the returned list is the
    tail of the list. Consider what to return if the list is empty.
 
-```haskell
+```purescript
 Q> maybeTail [1, 2, 3]
 Just [2, 3]
 Q> maybeTail []
@@ -1452,10 +1412,10 @@ Q> maybeTail [1]
 Just []
 ```
 
-3. Define an `average` function that takes a `[Int]` and returns `Maybe Float` where the return
+3. Define an `average` function that takes a `[Int]` and returns `Maybe Number` where the return
    value is the average value. When and why might we need to return `Nothing`?
 
-```haskell
+```purescript
 Q> average [1, 2, 3]
 Just 2.0
 Q> average [1, 1, 3]
@@ -1467,7 +1427,7 @@ Nothing
 4. Define a function `maybeMaximumInt :: [Int] -> Maybe Int` function that takes a list of integers
    and finds the maximum integer of the list.
 
-```haskell
+```purescript
 Q> maybeMaximumInt [1, 3, 2]
 Just 3
 Q> maybeMaximumInt []
@@ -1480,17 +1440,17 @@ Just 42
    list of integers, then either returns the default value or the found maximum value. Use the
    function you defined in exercise 4 together with `maybe`.
 
-```haskell
+```purescript
 Q> maximumInt 42 [1, 2, 3]
 3
 Q> maximumInt 42 []
 42
 ```
 
-6. Define a function `firstMatch :: (a -> Bool) -> [a] -> Maybe a` that returns the first element in
+6. Define a function `firstMatch :: (a -> Boolean) -> [a] -> Maybe a` that returns the first element in
    a list that matches a given predicate, or `Nothing` otherwise.
 
-```haskell
+```purescript
 Q> firstMatch (== 3) [1, 2, 3]
 Just 3
 Q> firstMatch (== 3) []
@@ -1499,10 +1459,10 @@ Q> firstMatch even [1, 2, 3]
 Just 2
 ```
 
-7. Define a function `firstMatchOr :: (a -> Bool) -> a -> [a] -> a` that uses the `firstMatch`
+7. Define a function `firstMatchOr :: (a -> Boolean) -> a -> [a] -> a` that uses the `firstMatch`
    function together with `foldMaybe` to provide a default value unless we find a matching element.
 
-```haskell
+```purescript
 Q> firstMatchOr (== 3) 42 [1, 2, 3]
 3
 Q> firstMatchOr (== 3) 42 []
@@ -1513,10 +1473,10 @@ Q> firstMatchOr even 42 [1, 3, 5, 7]
 42
 ```
 
-8. Define a function `filterList :: (a -> Bool) -> [a] -> [a]` that takes a predicate and a list,
+8. Define a function `filterList :: (a -> Boolean) -> [a] -> [a]` that takes a predicate and a list,
    and returns all the elements matching the predicate.
 
-```haskell
+```purescript
 Q> filterList even [1..9]
 [2, 4, 6, 8]
 Q> filterList even [1, 3..9]
@@ -1525,7 +1485,7 @@ Q> filterList even [1, 3..9]
 
 9. Define a function `lengthOfList :: [a] -> Int` that returns the length of a list.
 
-```haskell
+```purescript
 Q> lengthOfList [1..9]
 9
 Q> lengthOfList []
@@ -1535,47 +1495,47 @@ Q> lengthOfList []
 10. Define a function `takeFromList :: Int -> [a] -> [a]` that returns the first N elements from a
     list, or as many as possible if N is greater than the length of the list.
 
-```haskell
+```purescript
 Q> takeFromList 3 [1..5]
 [1, 2, 3]
 Q> takeFromList 6 [1..5]
 [1, 2, 3, 4, 5]
 ```
 
-11. Define a function `takeWhileFromList :: (a -> Bool) -> [a] -> [a]` that takes elements from the
+11. Define a function `takeWhileFromList :: (a -> Boolean) -> [a] -> [a]` that takes elements from the
     list until it finds one that does not match the predicate passed to the function.
 
-```haskell
+```purescript
 Q> takeWhileFromList odd [1, 3, 5, 6, 7, 8, 9]
 [1, 3, 5]
 Q> takeWhileFromList even [1, 3, 5, 6, 7, 8, 9]
 []
 ```
 
-12. Define a function `takeUntilFromList :: (a -> Bool) -> [a] -> [a]` that takes elements from the
+12. Define a function `takeUntilFromList :: (a -> Boolean) -> [a] -> [a]` that takes elements from the
     list until it finds one that matches the predicate passed to the function.
 
-```haskell
+```purescript
 Q> takeUntilFromList even [1, 3, 5, 6, 7, 8, 9]
 [1, 3, 5]
 Q> takeUntilFromList odd [1, 3, 5, 6, 7, 8, 9]
 []
 ```
 
-13. Define a function `dropWhileFromList :: (a -> Bool) -> [a] -> [a]` that drops elements from the
+13. Define a function `dropWhileFromList :: (a -> Boolean) -> [a] -> [a]` that drops elements from the
     list until it finds one that does not match the predicate passed to the function.
 
-```haskell
+```purescript
 Q> dropWhileFromList odd [1, 3, 5, 6, 7, 8, 9]
 [6, 7, 8, 9]
 Q> dropWhileFromList even [1, 3, 5, 6, 7, 8, 9]
 [1, 3, 5, 6, 7, 8, 9]
 ```
 
-14. Define a function `dropUntilFromList :: (a -> Bool) -> [a] -> [a]` that drops elements from the
+14. Define a function `dropUntilFromList :: (a -> Boolean) -> [a] -> [a]` that drops elements from the
     list until it finds one that matches the predicate passed to the function.
 
-```haskell
+```purescript
 Q> dropUntilFromList odd [1, 3, 5, 6, 7, 8, 9]
 [1, 3, 5, 6, 7, 8, 9]
 Q> dropUntilFromList even [1, 3, 5, 6, 7, 8, 9]
@@ -1584,7 +1544,7 @@ Q> dropUntilFromList even [1, 3, 5, 6, 7, 8, 9]
 
 15. Define a function `zipList :: [a] -> [b] -> [(a, b)]`.
 
-```haskell
+```purescript
 Q> zipList [1..9] [5..10]
 [(1, 5), (2, 6), (3, 7), (4, 8), (5, 9), (6, 10)]
 Q> zipList [1..100] [42, 1337]
@@ -1597,7 +1557,7 @@ Q> zipList [] [1, 2, 3]
 
 16. Define a function `foldRight :: b -> (a -> b -> b) -> [a] -> b`.
 
-```haskell
+```purescript
 Q> foldRight 0 max [1, 2, 3]
 3
 Q> foldRight 0 max []
@@ -1610,14 +1570,14 @@ Q> foldRight 1 (*) [1, 2, 3]
 
 17. Define a function `pureList :: a -> [a]`.
 
-```haskell
+```purescript
 Q> pureList 42
 [42]
 ```
 
 18. Define a function `mapList :: (a -> b) -> [a] -> [b]`.
 
-```haskell
+```purescript
 Q> mapList (+ 1) [1, 2, 3]
 [2, 3, 4]
 Q> mapList (+ 1) []
@@ -1626,14 +1586,14 @@ Q> mapList (+ 1) []
 
 19[1]. Define a function `applyList :: [(a -> b)] -> [a] -> [b]`.
 
-```haskell
+```purescript
 Q> applyList [(+ 1), (* 2)] [1, 2, 3]
 [2, 3, 4, 2, 4, 6]
 ```
 
 20[1]. Define a function `bindList :: (a -> [b]) -> [a] -> [b]`.
 
-```haskell
+```purescript
 Q> bindList (\n -> replicate n n) [1, 2, 3, 4]
 [1, 2, 2, 3, 3, 3, 4, 4, 4, 4]
 ```
@@ -1648,7 +1608,7 @@ Q> bindList (\n -> replicate n n) [1, 2, 3, 4]
 When reading (and subsequently writing) Haskell code you will likely stumble upon type definitions
 that have exclamation marks (`!`) right before type names:
 
-```haskell
+```purescript
 data Tuple = Tuple !Int String
   deriving (Eq, Show)
 
@@ -1661,7 +1621,7 @@ The exclamation mark before the `Int` here is a strictness annotation. Let's loo
 affects the behavior of our constructor first and then see why that is. First let's evaluate an
 error to see what an crash looks like in our REPL:
 
-```haskell
+```purescript
 Q> error "CRASH"
 *** Exception: CRASH
 CallStack (from HasCallStack):
@@ -1678,7 +1638,7 @@ causes the crash to happen.
 
 Let's see how this strictness annotation seems to work out for our `stringFromTuple` function:
 
-```haskell
+```purescript
 Q> tuple = Tuple crash "hello"
 Q> stringFromTuple tuple
 *** Exception: CRASH
@@ -1694,12 +1654,12 @@ indeed see a crash happen.
 
 Let's take a look at what happens when we remove our strictness annotation:
 
-```haskell
+```purescript
 data Tuple = Tuple Int String
   deriving (Eq, Show)
 ```
 
-```haskell
+```purescript
 Q> tuple = Tuple crash "hello"
 Q> stringFromTuple tuple
 "hello"
@@ -1724,63 +1684,3 @@ value it should be returning will materialize at all.
 What it also means is that we have to be conscious that we may be building up massive amounts of
 these functions, called "thunks", when we stitch together expressions. This is called a "space leak"
 and is a common theme in Haskell users' frustrations when debugging the behavior of their program.
-
-### Lists and lazyness
-
-```haskell
-Q> take 3 [1 :: Int, 2, 3, crash]
-[ 1
-, 2
-, 3
-]
-Q> take 4 [1 :: Int, 2, 3, crash]
-*** Exception: CRASH
-CallStack (from HasCallStack):
-  error, called at <interactive>:59:9 in interactive:Ghci1
-```
-
-Here we can see that the list type in Haskell is lazy by default, and the values we get from it
-will only ever be evaluated if a function actually uses them. This also means that if I were to
-bind the second expression to a name, we will be holding on to an expression that will crash,
-unless we also happen to not use the 4th item of the list.
-
-Lazyness is in Haskell for a reason, however, so it's important to also consider what we are
-getting out of this feature. The easiest thing to show is how infinite lists are easy to work with:
-
-```haskell
-Q> take 5 [1..]
-[ 1
-, 2
-, 3
-, 4
-, 5
-]
-```
-
-What we are doing here is creating an infinite list of natural numbers (`[1..]`) and then passing
-that infinite list to `take`, with which we are only asking for 5 numbers. The end result is that
-we indeed only get 5 numbers, even though this infinite list expression is supposed to create an
-infinite list... But since it's really only a description of how to create this infinite list, we
-successively ask for more and more elements and eventually just stop asking, so at no point in time
-does an infinite (or close to it) list exist.
-
-This applies to many other similar contexts as well and is (in my personal opinion) a very nice
-feature to have, so much so that I'm convinced that the benefits outweigh the cost. I think it's a
-fair characterization that many things that in strict languages would be stack overflows
-transparently work the way you want them to in Haskell, so much so that we don't even notice the
-wins. Code in PureScript, a Haskell-like language that compiles to JavaScript, always has to
-consider whether or not something is stack safe and these considerations permeate the language. In
-a language based entirely on the composition of functions this can be quite a hassle sometimes.
-
-### More tools for strictness
-
-We can also annotate expressions with exclamation marks if we enable the `BangPatterns` extension,
-which enables us to say that an expression we are binding to a name should be evaluated. We can also
-use `seq` and `deepseq` to force evaluation of an expression, one level deep or completely,
-respectively.
-
-### More extensive material on lazyness
-
-Michael Snoyman from FP Complete has written
-[a good article](https://www.fpcomplete.com/blog/2017/09/all-about-strictness/) on lazyness and
-strictness annotations that is worth reading.
