@@ -773,8 +773,8 @@ true
 true
 ```
 
-3. Define a function that takes the last 3 elements of a `[Int]` and gets the average of them. Use
-   notes as inspiration.
+3. Define a function that takes the last 3 elements of a `Array Int` and gets the average of them.
+   Use notes as inspiration.
 
 ```purescript
 > averageOfLast3 [2, 4, 6, 8, 10]
@@ -829,10 +829,10 @@ clamp lowerBound upperBound value
   | value > upperBound = upperBound
   | otherwise = value
 
-clampAllToByteRange :: [Int] -> [Int]
+clampAllToByteRange :: Array Int -> Array Int
 clampAllToByteRange = List.map (clamp 0 255)
 
-clampAllToHundreds :: [Int] -> [Int]
+clampAllToHundreds :: Array Int -> Array Int
 clampAllToHundreds = List.map (clamp (-100) 100)
 ```
 
