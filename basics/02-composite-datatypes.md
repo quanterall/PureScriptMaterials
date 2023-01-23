@@ -160,13 +160,23 @@ Q> bool 42 1337 false
 1337
 ```
 
-## Interlude: Deriving `Eq` and `Show`
+## Interlude: Deriving `Eq`, `Generic` and `Show`
 
-In these examples you'll often find that there is a line under a lot of data definitions reading
-`deriving (Eq, Show)`. We'll look at what `deriving` and the other components to this mean in the
-4th chapter, but what you need to know right now is that this line will automatically generate the
-capability for these types to be displayed the terminal, as well as be compared to eachother value
-for value.
+In these examples you'll often find that there are some lines under type definitions that "derive"
+functionality. We'll go over the specifics of what this is in
+[the next chapter](./03-type-classes.md) but for now it's fine for you to just know that this
+is functionality we can get "for free" and that it means we can compare values of the types to
+each other and show them in the REPL.
+
+```purescript
+newtype Kilometer = Kilometer Number
+
+derive newtype instance eqKilometer :: Eq Kilometer
+derive instance genericKilometer :: Generic Kilometer _
+
+instance showKilometer :: Show Kilometer where
+  show = genericShow
+```
 
 ## Newtypes
 
@@ -194,23 +204,40 @@ parameters? The type system doesn't know anything about what these strings repre
 The solution to this issue is fairly simple:
 
 ```purescript
+import Prelude
+
 --       type    constructor
 newtype Source = Source String
 -- ^ This constructor, `Source`, takes one argument, a `String`.
 -- When that argument is supplied to it, we get a value of type `Source`.
-  deriving (Eq, Show)
+
+derive newtype instance eqSource :: Eq Source
+derive instance genericSource :: Generic Source _
+
+instance showSource :: Show Source where
+  show = genericShow
 
 --       type         constructor
 newtype Destination = Destination String
-  deriving (Eq, Show)
+
+derive newtype instance eqDestination :: Eq Destination
+derive instance genericDestination :: Generic Destination _
+
+instance showDestination :: Show Destination where
+  show = genericShow
 
 --       type         constructor
 newtype CopyPattern = CopyPattern String
-  deriving (Eq, Show)
+
+derive newtype instance eqCopyPattern :: Eq CopyPattern
+derive instance genericCopyPattern :: Generic CopyPattern _
+
+instance showCopyPattern :: Show CopyPattern where
+  show = genericShow
 
 filteredCopy :: Source -> Destination -> CopyPattern -> Effect Unit
 filteredCopy (Source source) (Destination destination) (CopyPattern copyPattern) = ...
--- ^ Note how we can deconstruct these wrappers just like with other forms of data definitions. This
+-- Note how we can deconstruct these wrappers just like with other forms of data definitions. This
 -- is a very useful thing to do when we effectively want to be working with the strings that these
 -- types contain. It means that while we cannot blindly pass strings **to** this function, we still
 -- have the ease of working with the wrapped types inside of it.
@@ -449,10 +476,20 @@ data RelationshipStatus
   | EngagedTo UserProfile
   | ItsComplicated
   | Single
-  deriving (Eq, Show)
+
+derive instance eqRelationshipStatus :: Eq RelationshipStatus
+derive instance genericRelationshipStatus :: Generic RelationshipStatus _
+
+instance showRelationshipStatus :: Show RelationshipStatus where
+  show = genericShow
 
 data MarriageInfo = MarriageInfo {spouse :: String, date :: Day}
-  deriving (Eq, Show)
+
+derive instance eqMarriageInfo :: Eq MarriageInfo
+derive instance genericMarriageInfo :: Generic MarriageInfo _
+
+instance showMarriageInfo :: Show MarriageInfo where
+  show = genericShow
 ```
 
 The different constructors all represent different cases and contain different data. In the case of
@@ -489,7 +526,12 @@ data IsSingle
   = DefinitelySingle
   | MaybeSingle
   | DefinitelyNotSingle
-  deriving (Eq, Show)
+
+derive instance eqIsSingle :: Eq IsSingle
+derive instance genericIsSingle :: Generic IsSingle _
+
+instance showIsSingle :: Show IsSingle where
+  show = genericShow
 
 isSingle :: RelationshipStatus -> IsSingle
 isSingle (MarriedTo _) = DefinitelyNotSingle
@@ -524,7 +566,12 @@ type.
 data DivisionResult
   = DivideSuccess Number
   | DivisionByZero
-  deriving (Show)
+
+derive instance eqDivisionResult :: Eq DivisionResult
+derive instance genericDivisionResult :: Generic DivisionResult _
+
+instance showDivisionResult :: Show DivisionResult where
+  show = genericShow
 ```
 
 ```purescript
@@ -550,10 +597,20 @@ data RelationshipStatus
   | EngagedTo UserProfile
   | ItsComplicated
   | Single
-  deriving (Eq, Show)
+
+derive instance eqRelationshipStatus :: Eq RelationshipStatus
+derive instance genericRelationshipStatus :: Generic RelationshipStatus _
+
+instance showRelationshipStatus :: Show RelationshipStatus where
+  show = genericShow
 
 data MarriageInfo = MarriageInfo {spouse :: String, date :: Day}
-  deriving (Eq, Show)
+
+derive instance eqMarriageInfo :: Eq MarriageInfo
+derive instance genericMarriageInfo :: Generic MarriageInfo _
+
+instance showMarriageInfo :: Show MarriageInfo where
+  show = genericShow
 ```
 
 3. Define a data type that more accurately reflects the having or not of a spouse and modify the
@@ -629,17 +686,32 @@ newtype UserProfile = UserProfile
     interests :: Array String,
     relationshipStatus :: RelationshipStatus
   }
-  deriving (Eq, Show)
+
+derive instance eqUserProfile :: Eq UserProfile
+derive instance genericUserProfile :: Generic UserProfile _
+
+instance showUserProfile :: Show UserProfile where
+  show = genericShow
 
 data RelationshipStatus
   = MarriedTo MarriageInfo
   | EngagedTo UserProfile
   | ItsComplicated
   | Single
-  deriving (Eq, Show)
+
+derive instance eqRelationshipStatus :: Eq RelationshipStatus
+derive instance genericRelationshipStatus :: Generic RelationshipStatus _
+
+instance showRelationshipStatus :: Show RelationshipStatus where
+  show = genericShow
 
 data MarriageInfo = MarriageInfo {spouse :: String, date :: Day}
-  deriving (Eq, Show)
+
+derive instance eqMarriageInfo :: Eq MarriageInfo
+derive instance genericMarriageInfo :: Generic MarriageInfo _
+
+instance showMarriageInfo :: Show MarriageInfo where
+  show = genericShow
 
 profileToString :: UserProfile -> String
 profileToString UserProfile {age, active, interests, relationshipStatus, username} =
@@ -705,12 +777,22 @@ site. However, if we instead make the `spouse` field take a type that allows us 
 -- Our `MarriageInfo` record now takes a `Spouse` type, which itself is a more
 -- expressive type allowing for either a string or a user profile
 data MarriageInfo = MarriageInfo {spouse :: Spouse, date :: Day}
-  deriving (Eq, Show)
+
+derive instance eqMarriageInfo :: Eq MarriageInfo
+derive instance genericMarriageInfo :: Generic MarriageInfo _
+
+instance showMarriageInfo :: Show MarriageInfo where
+  show = genericShow
 
 data Spouse
   = SpouseProfile UserProfile
   | SpouseName String
-  deriving (Eq, Show)
+
+derive instance eqSpouse :: Eq Spouse
+derive instance genericSpouse :: Generic Spouse _
+
+instance showSpouse :: Show Spouse where
+  show = genericShow
 ```
 
 This will give us the same capability as before, because we still support spouse names with strings:
@@ -780,22 +862,42 @@ data UserProfile = UserProfile
     interests :: Array String,
     relationshipStatus :: RelationshipStatus
   }
-  deriving (Eq, Show)
+
+derive instance eqUserProfile :: Eq UserProfile
+derive instance genericUserProfile :: Generic UserProfile _
+
+instance showUserProfile :: Show UserProfile where
+  show = genericShow
 
 data RelationshipStatus
   = MarriedTo MarriageInfo
   | EngagedTo UserProfile
   | ItsComplicated
   | Single
-  deriving (Eq, Show)
+
+derive instance eqRelationshipStatus :: Eq RelationshipStatus
+derive instance genericRelationshipStatus :: Generic RelationshipStatus _
+
+instance showRelationshipStatus :: Show RelationshipStatus where
+  show = genericShow
 
 data MarriageInfo = MarriageInfo {spouse :: Spouse, date :: Day}
-  deriving (Eq, Show)
+
+derive instance eqMarriageInfo :: Eq MarriageInfo
+derive instance genericMarriageInfo :: Generic MarriageInfo _
+
+instance showMarriageInfo :: Show MarriageInfo where
+  show = genericShow
 
 data Spouse
   = SpouseProfile UserProfile
   | SpouseName String
-  deriving (Eq, Show)
+
+derive instance eqSpouse :: Eq Spouse
+derive instance genericSpouse :: Generic Spouse _
+
+instance showSpouse :: Show Spouse where
+  show = genericShow
 
 profileToString :: UserProfile -> String
 profileToString UserProfile {age, active, interests, relationshipStatus, username} =
@@ -842,7 +944,12 @@ The most basic generic datatype is a type that can hold anything and that has on
 
 ```purescript
 data Holder a = Holder a
-  deriving (Eq, Show)
+
+derive instance eqHolder :: Eq a => Eq (Holder a)
+derive instance genericHolder :: Generic (Holder a) _
+
+instance showHolder :: Show a => Show (Holder a) where
+  show = genericShow
 ```
 
 Note how we now have a type variable on the left side of `=` which means that when we refer to the
@@ -863,19 +970,34 @@ data HttpResponse a = HttpResponse
     headers :: Array HttpHeader,
     body :: a
   }
-  deriving (Eq, Show)
+
+derive instance eqHttpResponse :: Eq a => Eq (HttpResponse a)
+derive instance genericHttpResponse :: Generic (HttpResponse a) _
+
+instance showHttpResponse :: Show a => Show (HttpResponse a) where
+  show = genericShow
 
 data HttpStatus
   = Ok Int
   | ClientError Int
   | ServerError Int
-  deriving (Eq, Show)
+
+derive instance eqHttpStatus :: Eq HttpStatus
+derive instance genericHttpStatus :: Generic HttpStatus _
+
+instance showHttpStatus :: Show HttpStatus where
+  show = genericShow
 
 data HttpHeader = HttpHeader
   { headerName :: String,
     headerValue :: String 
   }
-  deriving (Eq, Show)
+
+derive instance eqHttpHeader :: Eq HttpHeader
+derive instance genericHttpHeader :: Generic HttpHeader _
+
+instance showHttpHeader :: Show HttpHeader where
+  show = genericShow
 ```
 
 We can see here that `HttpResponse` is generic over different types of body types. This means we can
@@ -925,7 +1047,12 @@ data SomeAmountOf a
   | One a
   | CoupleOf a a
   | BunchOf a a (Array a)
-  deriving (Eq, Show)
+
+derive instance eqSomeAmountOf :: Eq a => Eq (SomeAmountOf a)
+derive instance genericSomeAmountOf :: Generic (SomeAmountOf a) _
+
+instance showSomeAmountOf :: Show a => Show (SomeAmountOf a) where
+  show = genericShow
 
 none :: SomeAmountOf Int
 none = None
@@ -947,7 +1074,12 @@ bunchOf = BunchOf 42 1337 [1, 2, 3]
 
 ```purescript
 data Holder a = Holder a
-  deriving (Eq, Show)
+
+derive instance eqHolder :: Eq a => Eq (Holder a)
+derive instance genericHolder :: Generic (Holder a) _
+
+instance showHolder :: Show a => Show (Holder a) where
+  show = genericShow
 ```
 
 2. Define a function `pureHolder :: a -> Holder a`. Knowing what you know about partial
@@ -1081,10 +1213,20 @@ If we wanted to convert a `ResourceLoadStatus` to a `Maybe Resource`, we could d
 data ResourceLoadStatus
   = NotYetLoaded
   | Loaded Resource
-  deriving (Eq, Show)
+
+derive instance eqResourceLoadStatus :: Eq ResourceLoadStatus
+derive instance genericResourceLoadStatus :: Generic ResourceLoadStatus _
+
+instance showResourceLoadStatus :: Show ResourceLoadStatus where
+  show = genericShow
 
 newtype Resource = Resource String
-  deriving (Eq, Show)
+
+derive instance eqResource :: Eq Resource
+derive instance genericResource :: Generic Resource _
+
+instance showResource :: Show Resource where
+  show = genericShow
 
 resourceLoadStatusToMaybe :: ResourceLoadStatus -> Maybe Resource
 resourceLoadStatusToMaybe NotYetLoaded = Nothing
@@ -1217,17 +1359,32 @@ This, again, can be specialized down to something custom but still retain the sa
 data ResourceLoadResult
   = LoadFailure ResourceLoadError
   | LoadSuccess Resource
-  deriving (Eq, Show)
+
+derive instance eqResourceLoadResult :: Eq ResourceLoadResult
+derive instance genericResourceLoadResult :: Generic ResourceLoadResult _
+
+instance showResourceLoadResult :: Show ResourceLoadResult where
+  show = genericShow
 
 newtype Resource = Resource String
-  deriving (Eq, Show)
+
+derive instance eqResource :: Eq Resource
+derive instance genericResource :: Generic Resource _
+
+instance showResource :: Show Resource where
+  show = genericShow
 
 data ResourceLoadError
   = ResourceBusy
   | ResourceAccessDenied
   | ResourceHasBadData
   | UnknownResourceError String
-  deriving (Eq, Show)
+
+derive instance eqResourceLoadError :: Eq ResourceLoadError
+derive instance genericResourceLoadError :: Generic ResourceLoadError _
+
+instance showResourceLoadError :: Show ResourceLoadError where
+  show = genericShow
 ```
 
 The above definition holds the same information as a `Either ResourceLoadError Resource`, but can be
@@ -1293,14 +1450,23 @@ A tuple is an ad-hoc collection of values that can be of different types. Tuples
 many so called functional languages and Haskell is no exception:
 
 ```purescript
-tuple :: (Int, String)
-tuple = (42, "Forty-Two")
+import Data.Tuple (Tuple(..))
+import Data.Tuple.Nested((/\), tuple3)
 
-tuple' :: (Int, String, Boolean)
-tuple' = (42, "Forty-Two", false)
+tuple :: Tuple Int String
+tuple = Tuple 42 "Forty-Two" -- For tuples of 2 values we can use `Tuple`
 
-tuple'' :: (Int, String, Boolean, Number)
-tuple'' = (42, "Forty-Two", false, 1337.0)
+tuple' :: Tuple Int String
+tuple' = 42 /\ "Forty-Two" -- We can also use `/\` to construct tuples
+
+tuple'' :: Tuple3 Int String Boolean
+tuple'' = tuple3 42 "Forty-Two" false -- `tupleN` is used for other sizes
+
+tuple''' :: Tuple3 Int String Boolean
+tuple''' = 42 /\ "Forty-Two" /\ false -- We can use `/\` for those as well
+
+tuple'''' :: Tuple4 Int String Boolean Number
+tuple'''' = 42 /\ "Forty-Two" /\ false /\ 1337.0
 ```
 
 In many ways a tuple is the same as a record, except we are not naming the different components or
@@ -1333,34 +1499,31 @@ If we want to pattern match in this way on a sequence of items we can use `List`
 
 ### List
 
-<!-- @TODO: rework this section because PureScript does not define `List` the same way -->
-
-`List` / `[]` is interesting because it's defined in terms of operators:
-
-```purescript
-data [] a
-  = []
-  | a : [a]
-```
-
-So we have a type, called `[]` that takes an `a`. The constructors are `[]` itself, which is the
-empty list, and `:` which as the left argument takes an `a` and as the right argument takes another
-list, `[a]`. This means that a list is effectively the `:` operator applied over and over until it
-is connecting to a `[]`, which marks the end of the list:
-
-```purescript
-Q> 1 : 2 : 3 : 4 : []
-[ 1, 2, 3, 4 ]
-```
-
-Defined another way we have the following:
+A list in PureScript is a linked list. We can process each item one by one via pattern matching,
+which provides a neat way to work recursively with a sequence of items.
 
 ```purescript
 data List a
-  = EmptyList -- This is commonly called `Nil`
-  | Prepend a (List a) -- This is commonly called `Cons`
-  -- ^ `a` here is commonly called the "head" of the list, and the list it is connected to is
-  -- commonly called the "tail".
+  = Nil
+  | Cons a (List a)
+```
+
+We have a type, called `List` that takes an `a`. The constructors are `Nil`, which represents the
+empty list, and `Cons` which takes an element and a list. This means that a list can be created by
+applying `Cons` over and over until we get to a `Nil`:
+
+```purescript
+> import Data.List (List(..), (:))
+> Cons 1 (Cons 2 (Cons 3 Nil))
+(1 : 2 : 3 : Nil)
+```
+
+We can see above that `:` is an alias for `Cons`, so we can also write the following:
+
+```purescript
+> import Data.List (List(..), (:))
+> 1 : 2 : 3 : Nil
+(1 : 2 : 3 : Nil)
 ```
 
 Lists are useful any time you need to have zero or more of something. It's important to note that
@@ -1372,30 +1535,30 @@ them with pattern matching. If we want to examine a list in similar ways to our 
 so using the same tools we would otherwise:
 
 ```purescript
-maybeFirstElement :: [a] -> Maybe a
+maybeFirstElement :: List a -> Maybe a
 maybeFirstElement (a : _) = Just a
 maybeFirstElement [] = Nothing
 
-maybeFirstElement' :: [a] -> Maybe a
+maybeFirstElement' :: List a -> Maybe a
 maybeFirstElement' list = case list of
   a : _ -> Just a
   [] -> Nothing
 
-maybeFirstTwoElements :: [a] -> Maybe (a, a)
+maybeFirstTwoElements :: List a -> Maybe (a, a)
 maybeFirstTwoElements (a : b : _) = Just (a, b)
 maybeFirstTwoElements [] = Nothing
 
-maybeFirstTwoElements' :: [a] -> Maybe (a, a)
+maybeFirstTwoElements' :: List a -> Maybe (a, a)
 maybeFirstTwoElements' list = case list of
   a : b : _ -> Just (a, b)
   [] -> Nothing
 
-maybeFirstAndRest :: [a] -> Maybe (a, [a])
+maybeFirstAndRest :: List a -> Maybe (a, List a)
 maybeFirstAndRest (a : rest) = Just (a, rest)
 maybeFirstAndRest _anyOtherCase = Nothing
 
 -- We can also match to an exact structure of a list
-maybeExactlyTwoElements :: [a] -> Maybe (a, a)
+maybeExactlyTwoElements :: List a -> Maybe (a, a)
 maybeExactlyTwoElements [a, b] = Just (a, b)
 maybeExactlyTwoElements _anyOtherCase = Nothing
 ```
@@ -1417,8 +1580,8 @@ Q> divideBySumOfRestOfList []
 Nothing
 ```
 
-2. Define a function that takes a `[a]` and returns a `Maybe [a]` where the returned list is the
-   tail of the list. Consider what to return if the list is empty.
+2. Define a function that takes a `List a` and returns a `Maybe (List a)` where the returned list
+   is the tail of the list. Consider what to return if the list is empty.
 
 ```purescript
 Q> maybeTail [1, 2, 3]
@@ -1464,8 +1627,8 @@ Q> maximumInt 42 []
 42
 ```
 
-6. Define a function `firstMatch :: (a -> Boolean) -> [a] -> Maybe a` that returns the first element in
-   a list that matches a given predicate, or `Nothing` otherwise.
+6. Define a function `firstMatch :: (a -> Boolean) -> List a -> Maybe a` that returns the first
+   element in a list that matches a given predicate, or `Nothing` otherwise.
 
 ```purescript
 Q> firstMatch (== 3) [1, 2, 3]
@@ -1476,7 +1639,7 @@ Q> firstMatch even [1, 2, 3]
 Just 2
 ```
 
-7. Define a function `firstMatchOr :: (a -> Boolean) -> a -> [a] -> a` that uses the `firstMatch`
+7. Define a function `firstMatchOr :: (a -> Boolean) -> a -> List a -> a` that uses the `firstMatch`
    function together with `foldMaybe` to provide a default value unless we find a matching element.
 
 ```purescript
@@ -1490,8 +1653,8 @@ Q> firstMatchOr even 42 [1, 3, 5, 7]
 42
 ```
 
-8. Define a function `filterList :: (a -> Boolean) -> [a] -> [a]` that takes a predicate and a list,
-   and returns all the elements matching the predicate.
+8. Define a function `filterList :: (a -> Boolean) -> List a -> List a` that takes a predicate and
+   a list, and returns all the elements matching the predicate.
 
 ```purescript
 Q> filterList even [1..9]
@@ -1500,7 +1663,7 @@ Q> filterList even [1, 3..9]
 []
 ```
 
-9. Define a function `lengthOfList :: [a] -> Int` that returns the length of a list.
+9. Define a function `lengthOfList :: List a -> Int` that returns the length of a list.
 
 ```purescript
 Q> lengthOfList [1..9]
@@ -1509,8 +1672,8 @@ Q> lengthOfList []
 0
 ```
 
-10. Define a function `takeFromList :: Int -> [a] -> [a]` that returns the first N elements from a
-    list, or as many as possible if N is greater than the length of the list.
+10. Define a function `takeFromList :: Int -> List a -> List a` that returns the first N elements
+    from a list, or as many as possible if N is greater than the length of the list.
 
 ```purescript
 Q> takeFromList 3 [1..5]
@@ -1519,8 +1682,8 @@ Q> takeFromList 6 [1..5]
 [1, 2, 3, 4, 5]
 ```
 
-11. Define a function `takeWhileFromList :: (a -> Boolean) -> [a] -> [a]` that takes elements from the
-    list until it finds one that does not match the predicate passed to the function.
+11. Define a function `takeWhileFromList :: (a -> Boolean) -> List a -> List a` that takes elements
+    from the list until it finds one that does not match the predicate passed to the function.
 
 ```purescript
 Q> takeWhileFromList odd [1, 3, 5, 6, 7, 8, 9]
@@ -1529,8 +1692,8 @@ Q> takeWhileFromList even [1, 3, 5, 6, 7, 8, 9]
 []
 ```
 
-12. Define a function `takeUntilFromList :: (a -> Boolean) -> [a] -> [a]` that takes elements from the
-    list until it finds one that matches the predicate passed to the function.
+12. Define a function `takeUntilFromList :: (a -> Boolean) -> List a -> List a` that takes elements
+    from the list until it finds one that matches the predicate passed to the function.
 
 ```purescript
 Q> takeUntilFromList even [1, 3, 5, 6, 7, 8, 9]
@@ -1539,8 +1702,8 @@ Q> takeUntilFromList odd [1, 3, 5, 6, 7, 8, 9]
 []
 ```
 
-13. Define a function `dropWhileFromList :: (a -> Boolean) -> [a] -> [a]` that drops elements from the
-    list until it finds one that does not match the predicate passed to the function.
+13. Define a function `dropWhileFromList :: (a -> Boolean) -> List a -> List a` that drops elements
+    from the list until it finds one that does not match the predicate passed to the function.
 
 ```purescript
 Q> dropWhileFromList odd [1, 3, 5, 6, 7, 8, 9]
@@ -1549,8 +1712,8 @@ Q> dropWhileFromList even [1, 3, 5, 6, 7, 8, 9]
 [1, 3, 5, 6, 7, 8, 9]
 ```
 
-14. Define a function `dropUntilFromList :: (a -> Boolean) -> [a] -> [a]` that drops elements from the
-    list until it finds one that matches the predicate passed to the function.
+14. Define a function `dropUntilFromList :: (a -> Boolean) -> List a -> List a` that drops elements
+    from the list until it finds one that matches the predicate passed to the function.
 
 ```purescript
 Q> dropUntilFromList odd [1, 3, 5, 6, 7, 8, 9]
@@ -1559,7 +1722,7 @@ Q> dropUntilFromList even [1, 3, 5, 6, 7, 8, 9]
 [6, 7, 8, 9]
 ```
 
-15. Define a function `zipList :: [a] -> [b] -> [(a, b)]`.
+15. Define a function `zipList :: List a -> List b -> [(a, b)]`.
 
 ```purescript
 Q> zipList [1..9] [5..10]
@@ -1572,7 +1735,7 @@ Q> zipList [] [1, 2, 3]
 []
 ```
 
-16. Define a function `foldRight :: b -> (a -> b -> b) -> [a] -> b`.
+16. Define a function `foldRight :: b -> (a -> b -> b) -> List a -> b`.
 
 ```purescript
 Q> foldRight 0 max [1, 2, 3]
@@ -1585,14 +1748,14 @@ Q> foldRight 1 (*) [1, 2, 3]
 6
 ```
 
-17. Define a function `pureList :: a -> [a]`.
+17. Define a function `pureList :: a -> List a`.
 
 ```purescript
 Q> pureList 42
 [42]
 ```
 
-18. Define a function `mapList :: (a -> b) -> [a] -> [b]`.
+18. Define a function `mapList :: (a -> b) -> List a -> List b`.
 
 ```purescript
 Q> mapList (+ 1) [1, 2, 3]
@@ -1601,14 +1764,14 @@ Q> mapList (+ 1) []
 []
 ```
 
-19[1]. Define a function `applyList :: [(a -> b)] -> [a] -> [b]`.
+19[1]. Define a function `applyList :: [(a -> b)] -> List a -> List b`.
 
 ```purescript
 Q> applyList [(+ 1), (* 2)] [1, 2, 3]
 [2, 3, 4, 2, 4, 6]
 ```
 
-20[1]. Define a function `bindList :: (a -> [b]) -> [a] -> [b]`.
+20[1]. Define a function `bindList :: (a -> List b) -> List a -> List b`.
 
 ```purescript
 Q> bindList (\n -> replicate n n) [1, 2, 3, 4]
@@ -1620,84 +1783,3 @@ Q> bindList (\n -> replicate n n) [1, 2, 3, 4]
 0. [sum](https://www.stackage.org/haddock/lts-17.12/base-4.14.1.0/Prelude.html#v:sum)
 1. These exercises can be skipped in the interest of time.
 
-## Strictness annotations
-
-When reading (and subsequently writing) Haskell code you will likely stumble upon type definitions
-that have exclamation marks (`!`) right before type names:
-
-```purescript
-data Tuple = Tuple !Int String
-  deriving (Eq, Show)
-
--- This takes the string from our tuples
-stringFromTuple :: Tuple -> String
-stringFromTuple (Tuple _ string) = string
-```
-
-The exclamation mark before the `Int` here is a strictness annotation. Let's look at how this
-affects the behavior of our constructor first and then see why that is. First let's evaluate an
-error to see what an crash looks like in our REPL:
-
-```purescript
-Q> error "CRASH"
-*** Exception: CRASH
-CallStack (from HasCallStack):
-  error, called at <interactive>:24:1 in interactive:Ghci2
-Q> crash = error "CRASH"
-Q> crash
-*** Exception: CRASH
-CallStack (from HasCallStack):
-  error, called at <interactive>:25:5 in interactive:Ghci2
-```
-
-We first evaluate the error, then set `crash` to be that expression. Evaluating `crash` now reliably
-causes the crash to happen.
-
-Let's see how this strictness annotation seems to work out for our `stringFromTuple` function:
-
-```purescript
-Q> tuple = Tuple crash "hello"
-Q> stringFromTuple tuple
-*** Exception: CRASH
-CallStack (from HasCallStack):
-  error, called at <interactive>:45:9 in interactive:Ghci1
-```
-
-So, we first bind `tuple` to the expression that creates a `Tuple` out of our crash value and
-"hello". It might seem surprising to some, but consider that if you defined a function to crash
-you'd also have to execute it in order to have it crash. After we've defined that we then use our
-function that takes the string (which is just a normal value, no crash) out of the `Tuple` and we
-indeed see a crash happen.
-
-Let's take a look at what happens when we remove our strictness annotation:
-
-```purescript
-data Tuple = Tuple Int String
-  deriving (Eq, Show)
-```
-
-```purescript
-Q> tuple = Tuple crash "hello"
-Q> stringFromTuple tuple
-"hello"
-```
-
-We don't see a crash, even though the crashing value is plainly in the `Tuple`. This happens because
-Haskell defaults to lazy/non-strict evaluation, meaning it will only actually evaluate expressions
-when they are needed by something else. Printing our `Tuple` to the terminal evaluates our crash
-immediately so we might not notice this distinction in that case, but creating a function that only
-uses parts of a structure can find these distinctions much more easily.
-
-What we are doing when we add the strictness annotation to `Int` in our crashing example is say that
-we want this piece of data to be fully evaluated when the structure itself is evaluated, even in the
-case where the default behavior would not evaluate it.
-
-Since this behavior applies to all expressions in Haskell (we only evaluate what is needed), what
-does that mean for the actual execution of a program? In short, it means that every expression you
-define is actually really just a recipe/formula for whatever value it should be producing,
-represented as a function. If that function is never called, neither the expressions in it nor the
-value it should be returning will materialize at all.
-
-What it also means is that we have to be conscious that we may be building up massive amounts of
-these functions, called "thunks", when we stitch together expressions. This is called a "space leak"
-and is a common theme in Haskell users' frustrations when debugging the behavior of their program.
