@@ -743,7 +743,7 @@ solution upperBound divisors =
 
 1. Define a function using a pipeline that takes a list of `Int`, gets all the even numbers in it,
    multiplies them all by two and returns the sum[1]. Define versions that use:
-   - a named argument; with `&`
+   - a named argument; with `#`
    - an unnamed argument; with `>>>`
 
 ```purescript
@@ -761,7 +761,7 @@ solution upperBound divisors =
 2. Define a function using a pipeline that takes a list of `Int`, takes numbers until it finds one
    that is not even[2], multiplies them all by two, sums them up and returns whether or not the
    sum is even. Define versions that use:
-   - a named argument; with `&`
+   - a named argument; with `#`
    - an unnamed argument; with `>>>`
 
 ```purescript
