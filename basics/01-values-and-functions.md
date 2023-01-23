@@ -297,9 +297,9 @@ false
    they make up.
 
 ```purescript
-> rectangleArea 2.5 3
+> rectangleArea 2.5 3.0
 7.5
-> rectangleArea 2 2
+> rectangleArea 2.0 2.0
 4.0
 ```
 
@@ -316,9 +316,9 @@ false
    `Int` representing height in centimeters and returns the person's BMI.
 
 ```purescript
-> bmi 185 90
+> bmi 90.0 185 
 26.3
-> bmi 165 60
+> bmi 60.0 165
 22.0
 ```
 
