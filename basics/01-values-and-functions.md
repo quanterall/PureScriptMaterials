@@ -552,7 +552,7 @@ subtractAllFrom42 = map (42 - _)
 > import Data.Array ((..))
 > allZeros [0, 1, 0, 2, 0, 3]
 [0, 0, 0]
-> allZeros 1..9
+> allZeros (1..9)
 []
 ```
 
@@ -562,7 +562,7 @@ subtractAllFrom42 = map (42 - _)
 ```purescript
 > numbersAboveZero [0, 1, 0, 2, 0, 3]
 [1, 2, 3]
-> numbersAboveZero 1..9
+> numbersAboveZero (1..9)
 [1, 2, 3, 4, 5, 6, 7, 8, 9]
 ```
 
@@ -570,9 +570,9 @@ subtractAllFrom42 = map (42 - _)
    that is above 10. `takeWhile`[2] can be useful for this.
 
 ```purescript
-> takeBelow10 5..15
+> takeBelow10 (5..15)
 [5, 6, 7, 8, 9]
-> takeBelow10 1..9
+> takeBelow10 (1..9)
 [1, 2, 3, 4, 5, 6, 7, 8, 9]
 > takeBelow10 []
 []
@@ -585,7 +585,7 @@ subtractAllFrom42 = map (42 - _)
 ```purescript
 > areAllEven [2, 4, 6, 8, 10]
 true
-> areAllEven 1..9
+> areAllEven (1..9)
 false
 > areAllEven []
 true
@@ -750,7 +750,7 @@ solution upperBound divisors =
 > import Data.Array ((..))
 > multipliedEvenSum [2, 4, 6, 8, 10]
 60
-> multipliedEvenSum 1..9
+> multipliedEvenSum (1..9)
 40
 > multipliedEvenSum []
 0
