@@ -91,7 +91,7 @@ myString = "This is not the best string in the world, it's just a tribute"
 
 -- `String`s also handle "exotic" script
 helloThere :: String
-helloThere = "И един мармот завива шоколада в станион"
+helloThere = "И един мармот завива шоколада в станиол"
 ```
 
 ### Exercises (Values)
