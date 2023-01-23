@@ -186,22 +186,22 @@ an individual basis in terms of whether or not it makes the code more or less ea
 
 ### Boolean & arithmetic operations
 
-|   Math  |  PureScript  | Notes |
-| :-----: |  :-----:     | :-------------------------------------: |
-|    +    |       +      |                                         |
-|    -    |       -      |                                         |
-|    *    |       *      |                                         |
-|    /    |       /      |                                         |
-|    >    |       >      |                                         |
-|    <    |       <      |                                         |
-|    ≥    |      >=      |                                         |
-|    ≤    |      <=      |                                         |
-|    =    |      ==      |                                         |
-|    ≠    |      /=      |                                         |
-|    xⁿ   |     x ^ n    | x is numeric, n is integral             |
-|    xⁿ   |    x ** n    | x & n are both floating point values    |
-| x mod n |  x `rem` n   | x and n are integral [0]                |
-| x mod n |  x `mod` n   | x and n are integral [0]                |
+|   Math  |  PureScript                   |                Notes                    |
+| :-----: |  :--------------------------: | :-------------------------------------: |
+|    +    |       +                       |                                         |
+|    -    |       -                       |                                         |
+|    *    |       *                       |                                         |
+|    /    |       /                       |                                         |
+|    >    |       >                       |                                         |
+|    <    |       <                       |                                         |
+|    ≥    |      >=                       |                                         |
+|    ≤    |      <=                       |                                         |
+|    =    |      ==                       |                                         |
+|    ≠    |      /=                       |                                         |
+|    xⁿ   |    x `Int.pow` n              | x is numeric, n is integral             |
+|    xⁿ   |    x `Number.pow` n           | x & n are both floating point values    |
+| x mod n |  x `rem` n                    | x and n are integral [0]                |
+| x mod n |  x `mod` n                    | x and n are integral [0]                |
 
 | Math |  C   | PureScript |        Notes        |
 | :--: | :-:  |  :-----:   | :-----------------: |
