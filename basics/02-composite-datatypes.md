@@ -102,47 +102,47 @@ only the amount added depends on the boolean and we have special syntax for bool
 
 1. Create a function `and` that takes two `Boolean`s and returns `true` if both are true, `false`
    otherwise. Define versions using:
-   - `case` (`case (firstBoolean, secondBoolean)` will allow you to match on both at the same time)
+   - `case` (`case (Tuple firstBoolean secondBoolean)` will allow you to match on both at the same time)
    - Top-level pattern-matching
 
 ```purescript
-Q> and true true
+> and true true
 true
-Q> and false true
+> and false true
 false
-Q> and true false
+> and true false
 false
 ```
 
 2. Create a function `or` that takes two `Boolean`s and returns `true` if either is true, `false`
    otherwise. Define versions using:
-   - `case` (`case (firstBoolean, secondBoolean)` will allow you to match on both at the same time)
+   - `case` (`case (Tuple firstBoolean secondBoolean)` will allow you to match on both at the same time)
    - Top-level pattern-matching
 
 ```purescript
-Q> or false true
+> or false true
 true
-Q> or true false
+> or true false
 true
-Q> or true true
+> or true true
 true
-Q> or false false
+> or false false
 false
 ```
 
 3. Create a function `exclusiveOr` that takes two `Boolean`s and returns true if exactly one of them
    is true. Define versions using:
-   - `case` (`case (firstBoolean, secondBoolean)` will allow you to match on both at the same time)
+   - `case` (`case (Tuple firstBoolean secondBoolean)` will allow you to match on both at the same time)
    - Top-level pattern-matching
 
 ```purescript
-Q> exclusiveOr false true
+> exclusiveOr false true
 true
-Q> exclusiveOr true false
+> exclusiveOr true false
 true
-Q> exclusiveOr true true
+> exclusiveOr true true
 false
-Q> exclusiveOr false false
+> exclusiveOr false false
 false
 ```
 
@@ -154,9 +154,9 @@ false
    - Top-level pattern-matching
 
 ```purescript
-Q> bool 42 1337 true
+> bool 42 1337 true
 42
-Q> bool 42 1337 false
+> bool 42 1337 false
 1337
 ```
 
@@ -259,7 +259,7 @@ it's much easier to spot this mistake and if a value is produced in one place in
    `Meters` and adds them together to return a new `Meters`.
 
 ```purescript
-Q> addMeters (Meters 2.5) (Meters 3.0)
+> addMeters (Meters 2.5) (Meters 3.0)
 Meters 5.5
 ```
 
@@ -267,7 +267,7 @@ Meters 5.5
    takes `Meters` and correctly converts them into `Kilometers`.
 
 ```purescript
-Q> metersToKilometers (Meters 1050.0)
+> metersToKilometers (Meters 1050.0)
 Kilometers 1.05
 ```
 
@@ -275,7 +275,7 @@ Kilometers 1.05
    `Username` and returns its length.
 
 ```purescript
-Q> usernameLength (Username "pesho")
+> usernameLength (Username "pesho")
 5
 ```
 
@@ -311,11 +311,15 @@ The constructor name can be different than the type name, but this is comparativ
 We can see this in action in this snippet where we turn a profile into a string:
 
 ```purescript
+import Data.Foldable (intercalate)
+
 profileToString :: UserProfile -> String
-profileToString profile =
-  let ageString = show $ age profile
-      activeString = if active profile then "active" else "not active"
-      interestsString = intercalate ", " (interests profile)
+profileToString (UserProfile profile) =
+  let ageString = show $ profile.age
+      activeString = if profile.active then "active" else "not active"
+      -- `intercalate` inserts a separator between each string in an array and
+      -- joins them together
+      interestsString = intercalate ", " profile.interests
    -- `fold` here concatenates a list of strings into a string
    in fold
         [ username profile,
@@ -326,17 +330,12 @@ profileToString profile =
           ") is interested in: ",
           interestsString
         ]
-
--- | Inserts a given string between every entry in the list of strings
-intercalate :: String -> Array String -> String
-intercalate between strings =
-  fold $ Array.intersperse between strings
 ```
 
 Running this on our previously defined profile we get:
 
 ```purescript
-Q> profileToString rickard
+> profileToString rickard
 "rickard (34y, active) is interested in: Programming, Problem Solving, Teaching"
 ```
 
@@ -428,7 +427,7 @@ project-name quanterall/{basic,application,web-postgres}`.)
    string and the string itself.
 
 ```purescript
-Q> stringAndLength "hello"
+> stringAndLength "hello"
 StringAndLength
     { lengthOfString = 5
     , string = "hello"
@@ -440,11 +439,11 @@ StringAndLength
    a product.
 
 ```purescript
-Q> totalPrice Product {name = "Bio Cucumber", price = 5, taxationRate = 0.2}
+> totalPrice Product {name = "Bio Cucumber", price = 5, taxationRate = 0.2}
 6.0
-Q> totalPrice Product {name = "Bio Cucumber", price = 5, taxationRate = 0.1}
+> totalPrice Product {name = "Bio Cucumber", price = 5, taxationRate = 0.1}
 5.5
-Q> totalPrice Product {name = "Normal Cucumber", price = 1, taxationRate = 0.1}
+> totalPrice Product {name = "Normal Cucumber", price = 1, taxationRate = 0.1}
 1.1
 ```
 
@@ -575,9 +574,9 @@ instance showDivisionResult :: Show DivisionResult where
 ```
 
 ```purescript
-Q> divisionOrDefault 42 DivisionByZero 
+> divisionOrDefault 42 DivisionByZero 
 42.0
-Q> divisionOrDefault 42 (DivideSuccess 1337) 
+> divisionOrDefault 42 (DivideSuccess 1337) 
 1337.0
 ```
 
@@ -636,9 +635,9 @@ instance showMarriageInfo :: Show MarriageInfo where
    has been passed to it and vice versa.
 
 ```purescript
-Q> correspondingOrderType (BuyOrder (TickerSymbol "MSFT") 1000)
+> correspondingOrderType (BuyOrder (TickerSymbol "MSFT") 1000)
 SellOrder ( TickerSymbol "MSFT" ) 1000
-Q> correspondingOrderType (SellOrder (TickerSymbol "MSFT") 1000)
+> correspondingOrderType (SellOrder (TickerSymbol "MSFT") 1000)
 BuyOrder ( TickerSymbol "MSFT" ) 1000
 ```
 
@@ -648,14 +647,14 @@ BuyOrder ( TickerSymbol "MSFT" ) 1000
    the matched order[1]. If there is no match, indicate this in the return value.
 
 ```purescript
-Q> orders = [BuyOrder (TickerSymbol "AAPL") 1050, SellOrder (TickerSymbol "MSFT") 1000]
-Q> matchOrder (BuyOrder (TickerSymbol "MSFT") 1000) orders
+> orders = [BuyOrder (TickerSymbol "AAPL") 1050, SellOrder (TickerSymbol "MSFT") 1000]
+> matchOrder (BuyOrder (TickerSymbol "MSFT") 1000) orders
 MatchedOrder
     ( SellOrder ( TickerSymbol "MSFT" ) 1000 )
     [ BuyOrder ( TickerSymbol "AAPL" ) 1050 ]
-Q> matchOrder (SellOrder (TickerSymbol "MSFT") 1000) orders
+> matchOrder (SellOrder (TickerSymbol "MSFT") 1000) orders
 NoMatchedOrder
-Q> matchOrder (SellOrder (TickerSymbol "AAPL") 1050) orders
+> matchOrder (SellOrder (TickerSymbol "AAPL") 1050) orders
 MatchedOrder
     ( BuyOrder ( TickerSymbol "AAPL" ) 1050 )
     [ SellOrder ( TickerSymbol "MSFT" ) 1000 ]
@@ -748,7 +747,7 @@ intercalate between strings =
 If we now construct our `rickard` profile with this in mind we get the following:
 
 ```purescript
-Q> rickard = UserProfile {
+> rickard = UserProfile {
      username = "rickard",
      age = 34,
      active = true,
@@ -758,7 +757,7 @@ Q> rickard = UserProfile {
        date = Time.fromGregorian 2016 06 04
      }
    }
-Q> profileToString rickard
+> profileToString rickard
 "rickard (34y, active, Married to: Ivana on 2016-06-04) is interested in: Programming, Problem
 Solving, Teaching"
 ```
@@ -798,7 +797,7 @@ instance showSpouse :: Show Spouse where
 This will give us the same capability as before, because we still support spouse names with strings:
 
 ```purescript
-Q> rickard = UserProfile {
+> rickard = UserProfile {
      username = "rickard",
      age = 34,
      active = true,
@@ -808,7 +807,7 @@ Q> rickard = UserProfile {
        date = Time.fromGregorian 2016 06 04
      }
    }
-Q> profileToString rickard
+> profileToString rickard
 "rickard (34y, active, Married to: Ivana on 2016-06-04) is interested in: Programming, Problem
 Solving, Teaching"
 ```
@@ -816,7 +815,7 @@ Solving, Teaching"
 But we can now also use a user profile in our `spouse` field:
 
 ```purescript
-Q> ivana = UserProfile {
+> ivana = UserProfile {
      username = "ivana",
      age = 31,
      active = true,
@@ -826,7 +825,7 @@ Q> ivana = UserProfile {
        date = Time.fromGregorian 2016 06 04
      }
    }
-Q> profileToString ivana
+> profileToString ivana
 "ivana (31y, active, Married to: rickard on 2016-06-04) is interested in: Web Design, Cats, Beer"
 ```
 
@@ -1086,9 +1085,9 @@ instance showHolder :: Show a => Show (Holder a) where
    application, what is the most concise and direct definition you can come up with?
 
 ```purescript
-Q> pureHolder 42
+> pureHolder 42
 Holder 42
-Q> pureHolder "hello"
+> pureHolder "hello"
 Holder "hello"
 ```
 
@@ -1096,9 +1095,9 @@ Holder "hello"
    implement this function?
 
 ```purescript
-Q> foldHolder (+ 1) (Holder 42)
+> foldHolder (+ 1) (Holder 42)
 43
-Q> foldHolder length (Holder "hello")
+> foldHolder length (Holder "hello")
 5
 ```
 
@@ -1109,9 +1108,9 @@ Q> foldHolder length (Holder "hello")
    function and see what comes out.
 
 ```purescript
-Q> mapHolder (+ 1) (Holder 42)
+> mapHolder (+ 1) (Holder 42)
 Holder 43
-Q> mapHolder length (Holder "hello")
+> mapHolder length (Holder "hello")
 Holder 5
 ```
 
@@ -1119,18 +1118,18 @@ Holder 5
    is completely flexible in what it will hold.
 
 ```purescript
-Q> applyHolder (Holder (+ 1)) (Holder 42)
+> applyHolder (Holder (+ 1)) (Holder 42)
 Holder 43
-Q> applyHolder (Holder length) (Holder "hello")
+> applyHolder (Holder length) (Holder "hello")
 Holder 5
 ```
 
 6. Define a function `bindHolder :: (a -> Holder b) -> Holder a -> Holder b`.
 
 ```purescript
-Q> bindHolder (\v -> Holder $ v + 1) (Holder 42)
+> bindHolder (\v -> Holder $ v + 1) (Holder 42)
 Holder 43
-Q> bindHolder (\v -> Holder $ length v) (Holder "hello")
+> bindHolder (\v -> Holder $ length v) (Holder "hello")
 Holder 5
 ```
 
@@ -1145,21 +1144,21 @@ Holder 5
    this new case for each of them.
 
 ```purescript
-Q> foldHolder (+ 1) 1337 (Holder 42)
+> foldHolder (+ 1) 1337 (Holder 42)
 43
-Q> foldHolder (+ 1) 1337 NoValue
+> foldHolder (+ 1) 1337 NoValue
 1337
-Q> mapHolder (+ 1) NoValue
+> mapHolder (+ 1) NoValue
 NoValue
-Q> mapHolder length NoValue
+> mapHolder length NoValue
 NoValue
-Q> applyHolder NoValue (Holder 42)
+> applyHolder NoValue (Holder 42)
 NoValue
-Q> applyHolder (Holder (+ 1)) NoValue
+> applyHolder (Holder (+ 1)) NoValue
 NoValue
-Q> bindHolder (\v -> Holder $ v + 1) NoValue
+> bindHolder (\v -> Holder $ v + 1) NoValue
 NoValue
-Q> bindHolder (\v -> NoValue) (Holder 42)
+> bindHolder (\v -> NoValue) (Holder 42)
 NoValue
 ```
 
@@ -1243,11 +1242,11 @@ resourceLoadStatusToMaybe (Loaded resource) = Just resource
 
 <!-- markdownlint-disable MD013 -->
 ```purescript
-Q> user = User {username = Username "gonz", email = Email "rickard.andersson@quanterall.com", fullName = Just (FullName "Rickard Andersson"), phone = Just (PhoneNumber "555 363 22 34")}
-Q> showUserPhoneNumber user
+> user = User {username = Username "gonz", email = Email "rickard.andersson@quanterall.com", fullName = Just (FullName "Rickard Andersson"), phone = Just (PhoneNumber "555 363 22 34")}
+> showUserPhoneNumber user
 "555 363 22 34"
-Q> userWithoutPhone = user {phone = Nothing}
-Q> showUserPhoneNumber userWithoutPhone 
+> userWithoutPhone = user {phone = Nothing}
+> showUserPhoneNumber userWithoutPhone 
 "N/A"
 ```
 <!-- markdownlint-enable MD013 -->
@@ -1255,9 +1254,9 @@ Q> showUserPhoneNumber userWithoutPhone
 3. Define a function `pureMaybe :: a -> Maybe a`.
 
 ```purescript
-Q> pureMaybe 5
+> pureMaybe 5
 Just 5
-Q> pureMaybe "hello"
+> pureMaybe "hello"
 Just "hello"
 ```
 
@@ -1265,9 +1264,9 @@ Just "hello"
    the function to it. If it doesn't, return the `b` that you take in as an argument.
 
 ```purescript
-Q> foldMaybe 1337 (+ 1) (Just 42)
+> foldMaybe 1337 (+ 1) (Just 42)
 43
-Q> foldMaybe 1337 (+ 1) Nothing
+> foldMaybe 1337 (+ 1) Nothing
 1337
 ```
 
@@ -1276,11 +1275,11 @@ Q> foldMaybe 1337 (+ 1) Nothing
 
 <!-- markdownlint-disable MD013 -->
 ```purescript
-Q> user = User {username = Username "gonz", email = Email "rickard.andersson@quanterall.com", fullName = Just (Fullname "Rickard Andersson"), phone = Just (PhoneNumber "555 363 22 34")}
-Q> showUserPhoneNumber user
+> user = User {username = Username "gonz", email = Email "rickard.andersson@quanterall.com", fullName = Just (Fullname "Rickard Andersson"), phone = Just (PhoneNumber "555 363 22 34")}
+> showUserPhoneNumber user
 "555 363 22 34"
-Q> userWithoutPhone = user {phone = Nothing}
-Q> showUserPhoneNumber userWithoutPhone 
+> userWithoutPhone = user {phone = Nothing}
+> showUserPhoneNumber userWithoutPhone 
 "N/A"
 ```
 <!-- markdownlint-enable MD013 -->
@@ -1289,47 +1288,47 @@ Q> showUserPhoneNumber userWithoutPhone
    can reasonably do in the cases of `Just x` and `Nothing` are.
 
 ```purescript
-Q> mapMaybe (+ 1) (Just 42) 
+> mapMaybe (+ 1) (Just 42) 
 Just 43
-Q> mapMaybe length (Just "hello")
+> mapMaybe length (Just "hello")
 Just 5
-Q> mapMaybe (+ 1) Nothing 
+> mapMaybe (+ 1) Nothing 
 Nothing
-Q> mapMaybe length Nothing
+> mapMaybe length Nothing
 Nothing
 ```
 
 7. Define a function `applyMaybe :: Maybe (a -> b) -> Maybe a -> Maybe b`.
 
 ```purescript
-Q> applyMaybe (Just (+ 1)) (Just 42) 
+> applyMaybe (Just (+ 1)) (Just 42) 
 Just 43
-Q> applyMaybe (Just length) (Just "hello")
+> applyMaybe (Just length) (Just "hello")
 Just 5
-Q> applyMaybe (+ 1) Nothing 
+> applyMaybe (+ 1) Nothing 
 Nothing
-Q> applyMaybe length Nothing
+> applyMaybe length Nothing
 Nothing
-Q> applyMaybe Nothing (Just 42) 
+> applyMaybe Nothing (Just 42) 
 Nothing
-Q> applyMaybe Nothing (Just "hello")
+> applyMaybe Nothing (Just "hello")
 Nothing
 ```
 
 8. Define a function `bindMaybe :: (a -> Maybe b) -> Maybe a -> Maybe b`.
 
 ```purescript
-Q> bindMaybe (\v -> Just $ v + 1) (Just 42)
+> bindMaybe (\v -> Just $ v + 1) (Just 42)
 Just 43
-Q> bindMaybe (\v -> Just $ length v) (Just "hello")
+> bindMaybe (\v -> Just $ length v) (Just "hello")
 Just 5
-Q> bindMaybe (\v -> Nothing) (Just 42)
+> bindMaybe (\v -> Nothing) (Just 42)
 Nothing
-Q> bindMaybe (\v -> Nothing) (Just "hello")
+> bindMaybe (\v -> Nothing) (Just "hello")
 Nothing
-Q> bindMaybe (\v -> Just $ v + 1) Nothing
+> bindMaybe (\v -> Just $ v + 1) Nothing
 Nothing
-Q> bindMaybe (\v -> Just $ length v) Nothing
+> bindMaybe (\v -> Just $ length v) Nothing
 Nothing
 ```
 
@@ -1397,16 +1396,16 @@ of our own can be very descriptive.
 1. Define a function `foldEither :: (l -> a) -> (r -> a) -> Either l r -> a`.
 
 ```purescript
-Q> foldEither length (+ 1) $ Right 42
+> foldEither length (+ 1) $ Right 42
 43
-Q> foldEither length (+ 1) $ Left "error"
+> foldEither length (+ 1) $ Left "error"
 5
 ```
 
 2. Define a function `pureEither :: a -> Either l a`.
 
 ```purescript
-Q> pureEither 42
+> pureEither 42
 Right 42
 ```
 
@@ -1414,31 +1413,31 @@ Right 42
    to do if we have a `Left`.
 
 ```purescript
-Q> mapEither (+ 1) $ Right 42
+> mapEither (+ 1) $ Right 42
 Right 43
-Q> mapEither (+ 1) $ Left "error"
+> mapEither (+ 1) $ Left "error"
 Left "error"
 ```
 
 4. Define a function `applyEither :: Either l (r -> a) -> Either l r -> Either l a`.
 
 ```purescript
-Q> applyEither (Right (+ 1)) $ Right 42
+> applyEither (Right (+ 1)) $ Right 42
 Right 43
-Q> applyEither (Right (+ 1)) $ Left "error"
+> applyEither (Right (+ 1)) $ Left "error"
 Left "error"
-Q> applyEither (Left "other error") $ Right 42
+> applyEither (Left "other error") $ Right 42
 Left "other error"
 ```
 
 5. Define a function `bindEither :: (r -> Either l a) -> Either l r -> Either l a`.
 
 ```purescript
-Q> bindEither (\v -> Right (v + 1)) $ Right 42
+> bindEither (\v -> Right (v + 1)) $ Right 42
 Right 43
-Q> bindEither (\v -> Right (v + 1)) $ Left "error"
+> bindEither (\v -> Right (v + 1)) $ Left "error"
 Left "error"
-Q> bindEither (\v -> Left "error from the function we ran") $ Right 42
+> bindEither (\v -> Left "error from the function we ran") $ Right 42
 Left "error from the function we ran"
 ```
 
@@ -1570,13 +1569,13 @@ maybeExactlyTwoElements _anyOtherCase = Nothing
    `Nothing`.
 
 ```purescript
-Q> divideBySumOfRestOfList [1, 2, 3]
+> divideBySumOfRestOfList [1, 2, 3]
 Just 0.2
-Q> divideBySumOfRestOfList [1,2,3,4]
+> divideBySumOfRestOfList [1,2,3,4]
 Just 0.11111111
-Q> divideBySumOfRestOfList [1]
+> divideBySumOfRestOfList [1]
 Nothing
-Q> divideBySumOfRestOfList []
+> divideBySumOfRestOfList []
 Nothing
 ```
 
@@ -1584,11 +1583,11 @@ Nothing
    is the tail of the list. Consider what to return if the list is empty.
 
 ```purescript
-Q> maybeTail [1, 2, 3]
+> maybeTail [1, 2, 3]
 Just [2, 3]
-Q> maybeTail []
+> maybeTail []
 Nothing
-Q> maybeTail [1]
+> maybeTail [1]
 Just []
 ```
 
@@ -1596,11 +1595,11 @@ Just []
    value is the average value. When and why might we need to return `Nothing`?
 
 ```purescript
-Q> average [1, 2, 3]
+> average [1, 2, 3]
 Just 2.0
-Q> average [1, 1, 3]
+> average [1, 1, 3]
 Just 1.6666666
-Q> average []
+> average []
 Nothing
 ```
 
@@ -1608,11 +1607,11 @@ Nothing
    and finds the maximum integer of the list.
 
 ```purescript
-Q> maybeMaximumInt [1, 3, 2]
+> maybeMaximumInt [1, 3, 2]
 Just 3
-Q> maybeMaximumInt []
+> maybeMaximumInt []
 Nothing
-Q> maybeMaximumInt [1, 3, 2, -5, 42, 8, 9, 15]
+> maybeMaximumInt [1, 3, 2, -5, 42, 8, 9, 15]
 Just 42
 ```
 
@@ -1621,9 +1620,9 @@ Just 42
    function you defined in exercise 4 together with `maybe`.
 
 ```purescript
-Q> maximumInt 42 [1, 2, 3]
+> maximumInt 42 [1, 2, 3]
 3
-Q> maximumInt 42 []
+> maximumInt 42 []
 42
 ```
 
@@ -1631,11 +1630,11 @@ Q> maximumInt 42 []
    element in a list that matches a given predicate, or `Nothing` otherwise.
 
 ```purescript
-Q> firstMatch (== 3) [1, 2, 3]
+> firstMatch (== 3) [1, 2, 3]
 Just 3
-Q> firstMatch (== 3) []
+> firstMatch (== 3) []
 Nothing
-Q> firstMatch even [1, 2, 3]
+> firstMatch even [1, 2, 3]
 Just 2
 ```
 
@@ -1643,13 +1642,13 @@ Just 2
    function together with `foldMaybe` to provide a default value unless we find a matching element.
 
 ```purescript
-Q> firstMatchOr (== 3) 42 [1, 2, 3]
+> firstMatchOr (== 3) 42 [1, 2, 3]
 3
-Q> firstMatchOr (== 3) 42 []
+> firstMatchOr (== 3) 42 []
 42
-Q> firstMatchOr even 42 [1, 2, 3]
+> firstMatchOr even 42 [1, 2, 3]
 2
-Q> firstMatchOr even 42 [1, 3, 5, 7]
+> firstMatchOr even 42 [1, 3, 5, 7]
 42
 ```
 
@@ -1657,18 +1656,18 @@ Q> firstMatchOr even 42 [1, 3, 5, 7]
    a list, and returns all the elements matching the predicate.
 
 ```purescript
-Q> filterList even [1..9]
+> filterList even [1..9]
 [2, 4, 6, 8]
-Q> filterList even [1, 3..9]
+> filterList even [1, 3..9]
 []
 ```
 
 9. Define a function `lengthOfList :: List a -> Int` that returns the length of a list.
 
 ```purescript
-Q> lengthOfList [1..9]
+> lengthOfList [1..9]
 9
-Q> lengthOfList []
+> lengthOfList []
 0
 ```
 
@@ -1676,9 +1675,9 @@ Q> lengthOfList []
     from a list, or as many as possible if N is greater than the length of the list.
 
 ```purescript
-Q> takeFromList 3 [1..5]
+> takeFromList 3 [1..5]
 [1, 2, 3]
-Q> takeFromList 6 [1..5]
+> takeFromList 6 [1..5]
 [1, 2, 3, 4, 5]
 ```
 
@@ -1686,9 +1685,9 @@ Q> takeFromList 6 [1..5]
     from the list until it finds one that does not match the predicate passed to the function.
 
 ```purescript
-Q> takeWhileFromList odd [1, 3, 5, 6, 7, 8, 9]
+> takeWhileFromList odd [1, 3, 5, 6, 7, 8, 9]
 [1, 3, 5]
-Q> takeWhileFromList even [1, 3, 5, 6, 7, 8, 9]
+> takeWhileFromList even [1, 3, 5, 6, 7, 8, 9]
 []
 ```
 
@@ -1696,9 +1695,9 @@ Q> takeWhileFromList even [1, 3, 5, 6, 7, 8, 9]
     from the list until it finds one that matches the predicate passed to the function.
 
 ```purescript
-Q> takeUntilFromList even [1, 3, 5, 6, 7, 8, 9]
+> takeUntilFromList even [1, 3, 5, 6, 7, 8, 9]
 [1, 3, 5]
-Q> takeUntilFromList odd [1, 3, 5, 6, 7, 8, 9]
+> takeUntilFromList odd [1, 3, 5, 6, 7, 8, 9]
 []
 ```
 
@@ -1706,9 +1705,9 @@ Q> takeUntilFromList odd [1, 3, 5, 6, 7, 8, 9]
     from the list until it finds one that does not match the predicate passed to the function.
 
 ```purescript
-Q> dropWhileFromList odd [1, 3, 5, 6, 7, 8, 9]
+> dropWhileFromList odd [1, 3, 5, 6, 7, 8, 9]
 [6, 7, 8, 9]
-Q> dropWhileFromList even [1, 3, 5, 6, 7, 8, 9]
+> dropWhileFromList even [1, 3, 5, 6, 7, 8, 9]
 [1, 3, 5, 6, 7, 8, 9]
 ```
 
@@ -1716,65 +1715,65 @@ Q> dropWhileFromList even [1, 3, 5, 6, 7, 8, 9]
     from the list until it finds one that matches the predicate passed to the function.
 
 ```purescript
-Q> dropUntilFromList odd [1, 3, 5, 6, 7, 8, 9]
+> dropUntilFromList odd [1, 3, 5, 6, 7, 8, 9]
 [1, 3, 5, 6, 7, 8, 9]
-Q> dropUntilFromList even [1, 3, 5, 6, 7, 8, 9]
+> dropUntilFromList even [1, 3, 5, 6, 7, 8, 9]
 [6, 7, 8, 9]
 ```
 
 15. Define a function `zipList :: List a -> List b -> [(a, b)]`.
 
 ```purescript
-Q> zipList [1..9] [5..10]
+> zipList [1..9] [5..10]
 [(1, 5), (2, 6), (3, 7), (4, 8), (5, 9), (6, 10)]
-Q> zipList [1..100] [42, 1337]
+> zipList [1..100] [42, 1337]
 [(1, 42), (2, 1337)]
-Q> zipList [1..100] []
+> zipList [1..100] []
 []
-Q> zipList [] [1, 2, 3]
+> zipList [] [1, 2, 3]
 []
 ```
 
 16. Define a function `foldRight :: b -> (a -> b -> b) -> List a -> b`.
 
 ```purescript
-Q> foldRight 0 max [1, 2, 3]
+> foldRight 0 max [1, 2, 3]
 3
-Q> foldRight 0 max []
+> foldRight 0 max []
 3
-Q> foldRight 0 (+) [1, 2, 3]
+> foldRight 0 (+) [1, 2, 3]
 6
-Q> foldRight 1 (*) [1, 2, 3]
+> foldRight 1 (*) [1, 2, 3]
 6
 ```
 
 17. Define a function `pureList :: a -> List a`.
 
 ```purescript
-Q> pureList 42
+> pureList 42
 [42]
 ```
 
 18. Define a function `mapList :: (a -> b) -> List a -> List b`.
 
 ```purescript
-Q> mapList (+ 1) [1, 2, 3]
+> mapList (+ 1) [1, 2, 3]
 [2, 3, 4]
-Q> mapList (+ 1) []
+> mapList (+ 1) []
 []
 ```
 
 19[1]. Define a function `applyList :: [(a -> b)] -> List a -> List b`.
 
 ```purescript
-Q> applyList [(+ 1), (* 2)] [1, 2, 3]
+> applyList [(+ 1), (* 2)] [1, 2, 3]
 [2, 3, 4, 2, 4, 6]
 ```
 
 20[1]. Define a function `bindList :: (a -> List b) -> List a -> List b`.
 
 ```purescript
-Q> bindList (\n -> replicate n n) [1, 2, 3, 4]
+> bindList (\n -> replicate n n) [1, 2, 3, 4]
 [1, 2, 2, 3, 3, 3, 4, 4, 4, 4]
 ```
 
