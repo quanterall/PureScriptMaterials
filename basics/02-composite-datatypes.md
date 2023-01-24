@@ -1094,7 +1094,7 @@ Holder "hello"
    implement this function?
 
 ```purescript
-> foldHolder (+ 1) (Holder 42)
+> foldHolder (_ + 1) (Holder 42)
 43
 > foldHolder length (Holder "hello")
 5
@@ -1107,7 +1107,7 @@ Holder "hello"
    function and see what comes out.
 
 ```purescript
-> mapHolder (+ 1) (Holder 42)
+> mapHolder (_ + 1) (Holder 42)
 Holder 43
 > mapHolder length (Holder "hello")
 Holder 5
@@ -1117,7 +1117,7 @@ Holder 5
    is completely flexible in what it will hold.
 
 ```purescript
-> applyHolder (Holder (+ 1)) (Holder 42)
+> applyHolder (Holder (_ + 1)) (Holder 42)
 Holder 43
 > applyHolder (Holder length) (Holder "hello")
 Holder 5
@@ -1143,17 +1143,17 @@ Holder 5
    this new case for each of them.
 
 ```purescript
-> foldHolder (+ 1) 1337 (Holder 42)
+> foldHolder (_ + 1) 1337 (Holder 42)
 43
-> foldHolder (+ 1) 1337 NoValue
+> foldHolder (_ + 1) 1337 NoValue
 1337
-> mapHolder (+ 1) NoValue
+> mapHolder (_ + 1) NoValue
 NoValue
 > mapHolder length NoValue
 NoValue
 > applyHolder NoValue (Holder 42)
 NoValue
-> applyHolder (Holder (+ 1)) NoValue
+> applyHolder (Holder (_ + 1)) NoValue
 NoValue
 > bindHolder (\v -> Holder $ v + 1) NoValue
 NoValue
@@ -1263,9 +1263,9 @@ Just "hello"
    the function to it. If it doesn't, return the `b` that you take in as an argument.
 
 ```purescript
-> foldMaybe 1337 (+ 1) (Just 42)
+> foldMaybe 1337 (_ + 1) (Just 42)
 43
-> foldMaybe 1337 (+ 1) Nothing
+> foldMaybe 1337 (_ + 1) Nothing
 1337
 ```
 
@@ -1287,11 +1287,11 @@ Just "hello"
    can reasonably do in the cases of `Just x` and `Nothing` are.
 
 ```purescript
-> mapMaybe (+ 1) (Just 42) 
+> mapMaybe (_ + 1) (Just 42) 
 Just 43
 > mapMaybe length (Just "hello")
 Just 5
-> mapMaybe (+ 1) Nothing 
+> mapMaybe (_ + 1) Nothing 
 Nothing
 > mapMaybe length Nothing
 Nothing
@@ -1300,11 +1300,11 @@ Nothing
 7. Define a function `applyMaybe :: Maybe (a -> b) -> Maybe a -> Maybe b`.
 
 ```purescript
-> applyMaybe (Just (+ 1)) (Just 42) 
+> applyMaybe (Just (_ + 1)) (Just 42) 
 Just 43
 > applyMaybe (Just length) (Just "hello")
 Just 5
-> applyMaybe (+ 1) Nothing 
+> applyMaybe (_ + 1) Nothing 
 Nothing
 > applyMaybe length Nothing
 Nothing
@@ -1395,9 +1395,9 @@ of our own can be very descriptive.
 1. Define a function `foldEither :: (l -> a) -> (r -> a) -> Either l r -> a`.
 
 ```purescript
-> foldEither length (+ 1) $ Right 42
+> foldEither length (_ + 1) $ Right 42
 43
-> foldEither length (+ 1) $ Left "error"
+> foldEither length (_ + 1) $ Left "error"
 5
 ```
 
@@ -1412,18 +1412,18 @@ Right 42
    to do if we have a `Left`.
 
 ```purescript
-> mapEither (+ 1) $ Right 42
+> mapEither (_ + 1) $ Right 42
 Right 43
-> mapEither (+ 1) $ Left "error"
+> mapEither (_ + 1) $ Left "error"
 Left "error"
 ```
 
 4. Define a function `applyEither :: Either l (r -> a) -> Either l r -> Either l a`.
 
 ```purescript
-> applyEither (Right (+ 1)) $ Right 42
+> applyEither (Right (_ + 1)) $ Right 42
 Right 43
-> applyEither (Right (+ 1)) $ Left "error"
+> applyEither (Right (_ + 1)) $ Left "error"
 Left "error"
 > applyEither (Left "other error") $ Right 42
 Left "other error"
