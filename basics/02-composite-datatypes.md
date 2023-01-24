@@ -168,6 +168,10 @@ is functionality we can get "for free" and that it means we can compare values o
 each other and show them in the REPL.
 
 ```purescript
+import Prelude
+
+import Data.Show.Generic (genericShow)
+
 newtype Kilometer = Kilometer Number
 
 derive newtype instance eqKilometer :: Eq Kilometer
@@ -204,6 +208,8 @@ The solution to this issue is fairly simple:
 
 ```purescript
 import Prelude
+
+import Data.Show.Generic (genericShow)
 
 --       type    constructor
 newtype Source = Source String
@@ -466,8 +472,10 @@ We define a union type with the `data` keyword followed by the type name and `=`
 
 ```purescript
 -- This requires you to add `time` as a dependency in `package.yaml`
-import Data.Time (Day)
 import Prelude
+
+import Data.Show.Generic (genericShow)
+import Data.Time (Day)
 
 data RelationshipStatus
   = MarriedTo MarriageInfo -- This could also be `MarriedTo String Day`
@@ -520,6 +528,10 @@ represent what is actually the case we sometimes need to introduce more choices.
 that is perhaps more accurate:
 
 ```purescript
+import Prelude
+
+import Data.Show.Generic (genericShow)
+
 data IsSingle
   = DefinitelySingle
   | MaybeSingle
@@ -561,6 +573,8 @@ type.
    Remember that a `DivisionResult` looks as follows:
 
 ```purescript
+import Data.Show.Generic (genericShow)
+
 data DivisionResult
   = DivideSuccess Number
   | DivisionByZero
@@ -587,8 +601,10 @@ instance showDivisionResult :: Show DivisionResult where
 
 ```purescript
 -- This requires you to add `time` as a dependency in `package.yaml`
-import Data.Time (Day)
 import Prelude
+
+import Data.Show.Generic (genericShow)
+import Data.Time (Day)
 
 data RelationshipStatus
   = MarriedTo MarriageInfo
@@ -672,10 +688,12 @@ type is already embedded in the `MarriedTo` constructor. So let's take that one 
 enrich our `UserProfile` data type by adding our `RelationshipStatus` to `UserProfile`:
 
 ```purescript
-import qualified Data.List as List
-import Data.Time (Day)
-import qualified Data.Time as Time
 import Prelude
+
+import Data.Show.Generic (genericShow)
+import Data.List as List
+import Data.Time (Day)
+import Data.Time as Time
 
 newtype UserProfile = UserProfile
   { username :: String,
@@ -774,6 +792,10 @@ site. However, if we instead make the `spouse` field take a type that allows us 
 ```purescript
 -- Our `MarriageInfo` record now takes a `Spouse` type, which itself is a more
 -- expressive type allowing for either a string or a user profile
+import Prelude
+
+import Data.Show.Generic (genericShow)
+
 data MarriageInfo = MarriageInfo {spouse :: Spouse, date :: Day}
 
 derive instance eqMarriageInfo :: Eq MarriageInfo
@@ -848,10 +870,12 @@ other.
 0. The code for `profileToString` and its associated types:
 
 ```purescript
-import qualified Data.List as List
-import Data.Time (Day)
-import qualified Data.Time as Time
 import Prelude
+
+import Data.List as List
+import Data.Show.Generic (genericShow)
+import Data.Time (Day)
+import Data.Time as Time
 
 data UserProfile = UserProfile
   { username :: String,
@@ -941,6 +965,10 @@ type `String`, as well as another usage has `Char` and `Int` instead. For this p
 The most basic generic datatype is a type that can hold anything and that has only one constructor:
 
 ```purescript
+import Prelude
+
+import Data.Show.Generic (genericShow)
+
 data Holder a = Holder a
 
 derive instance eqHolder :: Eq a => Eq (Holder a)
@@ -963,6 +991,10 @@ versions of them.
 If we were to define a generic record, for example, we could just do the following:
 
 ```purescript
+import Prelude
+
+import Data.Show.Generic (genericShow)
+
 data HttpResponse a = HttpResponse
   { status :: HttpStatus,
     headers :: Array HttpHeader,
@@ -1040,6 +1072,10 @@ HttpResponse
 With unions we predictably have the same format for generic unions as we do for basic ones:
 
 ```purescript
+import Prelude
+
+import Data.Show.Generic (genericShow)
+
 data SomeAmountOf a
   = None
   | One a
@@ -1071,6 +1107,10 @@ bunchOf = BunchOf 42 1337 [1, 2, 3]
    definition of `Holder` looks as follows:
 
 ```purescript
+import Prelude
+
+import Data.Show.Generic (genericShow)
+
 data Holder a = Holder a
 
 derive instance eqHolder :: Eq a => Eq (Holder a)
@@ -1208,6 +1248,10 @@ resource, or just want to display "N/A" when it's not loaded.
 If we wanted to convert a `ResourceLoadStatus` to a `Maybe Resource`, we could do the following:
 
 ```purescript
+import Prelude
+
+import Data.Show.Generic (genericShow)
+
 data ResourceLoadStatus
   = NotYetLoaded
   | Loaded Resource
