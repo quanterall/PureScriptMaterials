@@ -1533,48 +1533,51 @@ them with pattern matching. If we want to examine a list in similar ways to our 
 so using the same tools we would otherwise:
 
 ```purescript
+import Data.List as List
+import Data.List (List(..), (:))
+import Data.Tuple (Tuple(..))
+import Data.Tuple.Nested ((/\))
+
 maybeFirstElement :: List a -> Maybe a
 maybeFirstElement (a : _) = Just a
-maybeFirstElement [] = Nothing
+maybeFirstElement Nil = Nothing
 
 maybeFirstElement' :: List a -> Maybe a
 maybeFirstElement' list = case list of
   a : _ -> Just a
-  [] -> Nothing
+  Nil -> Nothing
 
-maybeFirstTwoElements :: List a -> Maybe (a, a)
-maybeFirstTwoElements (a : b : _) = Just (a, b)
-maybeFirstTwoElements [] = Nothing
+maybeFirstTwoElements :: List a -> Maybe (Tuple a a)
+maybeFirstTwoElements (a : b : _) = Just (a /\ b)
+maybeFirstTwoElements Nil = Nothing
 
-maybeFirstTwoElements' :: List a -> Maybe (a, a)
+maybeFirstTwoElements' :: List a -> Maybe (Tuple a a)
 maybeFirstTwoElements' list = case list of
-  a : b : _ -> Just (a, b)
-  [] -> Nothing
+  a : b : _ -> Just (a /\ b)
+  Nil -> Nothing
 
-maybeFirstAndRest :: List a -> Maybe (a, List a)
-maybeFirstAndRest (a : rest) = Just (a, rest)
+maybeFirstAndRest :: List a -> Maybe (Tuple a (List a))
+maybeFirstAndRest (a : rest) = Just (a /\ rest)
 maybeFirstAndRest _anyOtherCase = Nothing
-
--- We can also match to an exact structure of a list
-maybeExactlyTwoElements :: List a -> Maybe (a, a)
-maybeExactlyTwoElements [a, b] = Just (a, b)
-maybeExactlyTwoElements _anyOtherCase = Nothing
 ```
 
 #### Exercises (Lists)
 
-1. Define a function that takes a `[Int]` and divides the first element by the sum[0] of the rest of
-   the list. If the sum of the "tail" (rest) is 0 or there are no elements in the list, return
+1. Define a function that takes a `List Int` and divides the first element by the sum[0] of the rest
+   of the list. If the sum of the "tail" (rest) is 0 or there are no elements in the list, return
    `Nothing`.
 
 ```purescript
-> divideBySumOfRestOfList [1, 2, 3]
+import Data.List (List(..), (:))
+import Data.List as List
+
+> divideBySumOfRestOfList $ 1 : 2 : 3 : Nil
 Just 0.2
-> divideBySumOfRestOfList [1,2,3,4]
+> divideBySumOfRestOfList $ List.fromFoldable [1, 2, 3, 4]
 Just 0.11111111
-> divideBySumOfRestOfList [1]
+> divideBySumOfRestOfList $ 1 : Nil
 Nothing
-> divideBySumOfRestOfList []
+> divideBySumOfRestOfList Nil
 Nothing
 ```
 
@@ -1582,43 +1585,55 @@ Nothing
    is the tail of the list. Consider what to return if the list is empty.
 
 ```purescript
-> maybeTail [1, 2, 3]
-Just [2, 3]
-> maybeTail []
+import Data.List (List(..), (:))
+import Data.List as List
+
+> maybeTail $ List.fromFoldable [1, 2, 3]
+Just (2 : 3 : Nil)
+> maybeTail Nil
 Nothing
-> maybeTail [1]
-Just []
+> maybeTail $ 1 : Nil
+Just Nil
 ```
 
-3. Define an `average` function that takes a `[Int]` and returns `Maybe Number` where the return
+3. Define an `average` function that takes a `List Int` and returns `Maybe Number` where the return
    value is the average value. When and why might we need to return `Nothing`?
 
 ```purescript
-> average [1, 2, 3]
+import Data.List (List(..), (:))
+import Data.List as List
+
+> average $ List.fromFoldable [1, 2, 3]
 Just 2.0
-> average [1, 1, 3]
+> average $ List.fromFoldable [1, 1, 3]
 Just 1.6666666
-> average []
+> average Nil
 Nothing
 ```
 
-4. Define a function `maybeMaximumInt :: [Int] -> Maybe Int` function that takes a list of integers
+4. Define a function `maybeMaximumInt :: List Int -> Maybe Int` function that takes a list of integers
    and finds the maximum integer of the list.
 
 ```purescript
-> maybeMaximumInt [1, 3, 2]
+import Data.List (List(..), (:))
+import Data.List as List
+
+> maybeMaximumInt $ List.fromFoldable [1, 3, 2]
 Just 3
-> maybeMaximumInt []
+> maybeMaximumInt Nil
 Nothing
-> maybeMaximumInt [1, 3, 2, -5, 42, 8, 9, 15]
+> maybeMaximumInt $ List.fromFoldable [1, 3, 2, -5, 42, 8, 9, 15]
 Just 42
 ```
 
-5. Define a function `maximumInt :: Int -> [Int] -> Int` function that takes a default value and a
+5. Define a function `maximumInt :: Int -> List Int -> Int` function that takes a default value and a
    list of integers, then either returns the default value or the found maximum value. Use the
    function you defined in exercise 4 together with `maybe`.
 
 ```purescript
+import Data.List (List(..), (:))
+import Data.List as List
+
 > maximumInt 42 [1, 2, 3]
 3
 > maximumInt 42 []
@@ -1629,6 +1644,9 @@ Just 42
    element in a list that matches a given predicate, or `Nothing` otherwise.
 
 ```purescript
+import Data.List (List(..), (:))
+import Data.List as List
+
 > firstMatch (== 3) [1, 2, 3]
 Just 3
 > firstMatch (== 3) []
@@ -1641,6 +1659,9 @@ Just 2
    function together with `foldMaybe` to provide a default value unless we find a matching element.
 
 ```purescript
+import Data.List (List(..), (:))
+import Data.List as List
+
 > firstMatchOr (== 3) 42 [1, 2, 3]
 3
 > firstMatchOr (== 3) 42 []
@@ -1655,18 +1676,24 @@ Just 2
    a list, and returns all the elements matching the predicate.
 
 ```purescript
-> filterList even [1..9]
+import Data.List (List(..), (:))
+import Data.List as List
+
+> filterList even $ List.range 1 9
 [2, 4, 6, 8]
-> filterList even [1, 3..9]
+> filterList even $ List.fromFoldable [1, 3, 6, 9]
 []
 ```
 
 9. Define a function `lengthOfList :: List a -> Int` that returns the length of a list.
 
 ```purescript
-> lengthOfList [1..9]
+import Data.List (List(..), (:))
+import Data.List as List
+
+> lengthOfList $ List.range 1 9
 9
-> lengthOfList []
+> lengthOfList Nil
 0
 ```
 
@@ -1674,9 +1701,12 @@ Just 2
     from a list, or as many as possible if N is greater than the length of the list.
 
 ```purescript
-> takeFromList 3 [1..5]
+import Data.List (List(..), (:))
+import Data.List as List
+
+> takeFromList 3 $ List.range 1 5
 [1, 2, 3]
-> takeFromList 6 [1..5]
+> takeFromList 6 $ List.range 1 5
 [1, 2, 3, 4, 5]
 ```
 
@@ -1684,9 +1714,12 @@ Just 2
     from the list until it finds one that does not match the predicate passed to the function.
 
 ```purescript
-> takeWhileFromList odd [1, 3, 5, 6, 7, 8, 9]
+import Data.List (List(..), (:))
+import Data.List as List
+
+> takeWhileFromList odd $ List.fromFoldable [1, 3, 5, 6, 7, 8, 9]
 [1, 3, 5]
-> takeWhileFromList even [1, 3, 5, 6, 7, 8, 9]
+> takeWhileFromList even $ List.fromFoldable [1, 3, 5, 6, 7, 8, 9]
 []
 ```
 
@@ -1694,9 +1727,12 @@ Just 2
     from the list until it finds one that matches the predicate passed to the function.
 
 ```purescript
-> takeUntilFromList even [1, 3, 5, 6, 7, 8, 9]
+import Data.List (List(..), (:))
+import Data.List as List
+
+> takeUntilFromList even $ List.fromFoldable [1, 3, 5, 6, 7, 8, 9]
 [1, 3, 5]
-> takeUntilFromList odd [1, 3, 5, 6, 7, 8, 9]
+> takeUntilFromList odd $ List.fromFoldable [1, 3, 5, 6, 7, 8, 9]
 []
 ```
 
@@ -1704,9 +1740,12 @@ Just 2
     from the list until it finds one that does not match the predicate passed to the function.
 
 ```purescript
-> dropWhileFromList odd [1, 3, 5, 6, 7, 8, 9]
+import Data.List (List(..), (:))
+import Data.List as List
+
+> dropWhileFromList odd $ List.fromFoldable [1, 3, 5, 6, 7, 8, 9]
 [6, 7, 8, 9]
-> dropWhileFromList even [1, 3, 5, 6, 7, 8, 9]
+> dropWhileFromList even $ List.fromFoldable [1, 3, 5, 6, 7, 8, 9]
 [1, 3, 5, 6, 7, 8, 9]
 ```
 
@@ -1714,65 +1753,87 @@ Just 2
     from the list until it finds one that matches the predicate passed to the function.
 
 ```purescript
-> dropUntilFromList odd [1, 3, 5, 6, 7, 8, 9]
+import Data.List (List(..), (:))
+import Data.List as List
+import Data.Int as Int
+
+> dropUntilFromList Int.odd $ List.fromFoldable [1, 3, 5, 6, 7, 8, 9]
 [1, 3, 5, 6, 7, 8, 9]
-> dropUntilFromList even [1, 3, 5, 6, 7, 8, 9]
+> dropUntilFromList even $ List.fromFoldable [1, 3, 5, 6, 7, 8, 9]
 [6, 7, 8, 9]
 ```
 
 15. Define a function `zipList :: List a -> List b -> [(a, b)]`.
 
 ```purescript
-> zipList [1..9] [5..10]
+import Data.List (List(..), (:))
+import Data.List as List
+
+> zipList (List.range 1 9) $ List.range 5 10
 [(1, 5), (2, 6), (3, 7), (4, 8), (5, 9), (6, 10)]
-> zipList [1..100] [42, 1337]
+> zipList (List.range 1 100) $ List.fromFoldable [42, 1337]
 [(1, 42), (2, 1337)]
-> zipList [1..100] []
-[]
-> zipList [] [1, 2, 3]
-[]
+> zipList (List.range 1 100) Nil
+Nil
+> zipList Nil $ List.fromFoldable [1, 2, 3]
+Nil
 ```
 
 16. Define a function `foldRight :: b -> (a -> b -> b) -> List a -> b`.
 
 ```purescript
-> foldRight 0 max [1, 2, 3]
+import Data.List (List(..), (:))
+import Data.List as List
+
+> foldRight 0 max $ List.fromFoldable [1, 2, 3]
 3
-> foldRight 0 max []
+> foldRight 0 max Nil
 3
-> foldRight 0 (+) [1, 2, 3]
+> foldRight 0 (+) $ List.fromFoldable [1, 2, 3]
 6
-> foldRight 1 (*) [1, 2, 3]
+> foldRight 1 (*) $ List.fromFoldable [1, 2, 3]
 6
 ```
 
 17. Define a function `pureList :: a -> List a`.
 
 ```purescript
+import Data.List (List(..), (:))
+import Data.List as List
+
 > pureList 42
-[42]
+(42 : Nil)
 ```
 
 18. Define a function `mapList :: (a -> b) -> List a -> List b`.
 
 ```purescript
-> mapList (+ 1) [1, 2, 3]
+import Data.List (List(..), (:))
+import Data.List as List
+
+> mapList (_ + 1) $ List.fromFoldable [1, 2, 3]
 [2, 3, 4]
-> mapList (+ 1) []
+> mapList (_ + 1) Nil
 []
 ```
 
 19[1]. Define a function `applyList :: [(a -> b)] -> List a -> List b`.
 
 ```purescript
-> applyList [(+ 1), (* 2)] [1, 2, 3]
+import Data.List (List(..), (:))
+import Data.List as List
+
+> applyList [(_ + 1), (_ * 2)] $ List.fromFoldable [1, 2, 3]
 [2, 3, 4, 2, 4, 6]
 ```
 
 20[1]. Define a function `bindList :: (a -> List b) -> List a -> List b`.
 
 ```purescript
-> bindList (\n -> replicate n n) [1, 2, 3, 4]
+import Data.List (List(..), (:))
+import Data.List as List
+
+> bindList (\n -> replicate n n) $ List.fromFoldable [1, 2, 3, 4]
 [1, 2, 2, 3, 3, 3, 4, 4, 4, 4]
 ```
 
