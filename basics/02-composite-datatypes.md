@@ -6,7 +6,7 @@
     - [`case` for pattern matching on datatypes](#case-for-pattern-matching-on-datatypes)
     - [Top-level pattern matching](#top-level-pattern-matching)
     - [Exercises (Boolean)](#exercises-boolean)
-  - [Interlude: Deriving `Eq` and `Show`](#interlude-deriving-eq-and-show)
+  - [Interlude: Deriving `Eq`, `Generic` and `Show`](#interlude-deriving-eq-generic-and-show)
   - [Newtypes](#newtypes)
     - [Exercises (Newtypes)](#exercises-newtypes)
   - [Record types](#record-types)
@@ -32,7 +32,6 @@
     - [List](#list)
       - [Exercises (Lists)](#exercises-lists)
         - [Exercise notes (Lists)](#exercise-notes-lists)
-  - [Strictness annotations](#strictness-annotations)
 
 Not everything is just a primitive, of course, and we've actually already seen an example of a more
 complex datatype in the previous chapter about "Values and functions": `Boolean`.
