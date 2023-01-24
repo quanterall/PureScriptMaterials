@@ -350,10 +350,10 @@ We could also pattern match on our `UserProfile` type:
 profileToString' :: UserProfile -> String
 profileToString'
   UserProfile
-    { username = username,
-      age = age,
-      active = active,
-      interests = interests
+    { username: username,
+      age: age,
+      active: active,
+      interests: interests
     } =
   let ageString = show age
       activeString = if active then "active" else "not active"
@@ -410,7 +410,7 @@ languages and also applies when we construct records:
 ```purescript
 let userProfile =
       -- Note how we don't have to pass all of these without `=`
-      UserProfile {username = "rickard", age, active, interests}
+      UserProfile {username: "rickard", age, active, interests}
     age = 34
     active = true
     interests = ["Programming" , "Problem Solving" , "Teaching"]
@@ -434,8 +434,8 @@ project-name quanterall/{basic,application,web-postgres}`.)
 ```purescript
 > stringAndLength "hello"
 StringAndLength
-    { lengthOfString = 5
-    , string = "hello"
+    { lengthOfString: 5
+    , string: "hello"
     }
 ```
 
@@ -444,11 +444,11 @@ StringAndLength
    a product.
 
 ```purescript
-> totalPrice Product {name = "Bio Cucumber", price = 5, taxationRate = 0.2}
+> totalPrice Product {name: "Bio Cucumber", price: 5, taxationRate: 0.2}
 6.0
-> totalPrice Product {name = "Bio Cucumber", price = 5, taxationRate = 0.1}
+> totalPrice Product {name: "Bio Cucumber", price: 5, taxationRate: 0.1}
 5.5
-> totalPrice Product {name = "Normal Cucumber", price = 1, taxationRate = 0.1}
+> totalPrice Product {name: "Normal Cucumber", price: 1, taxationRate: 0.1}
 1.1
 ```
 
@@ -478,7 +478,7 @@ import Data.Show.Generic (genericShow)
 import Data.Time (Day)
 
 data RelationshipStatus
-  = MarriedTo MarriageInfo -- This could also be `MarriedTo String Day`
+  = MarriedTo {spouse :: String, date :: Day} -- This could also be `MarriedTo String Day`
   | EngagedTo UserProfile
   | ItsComplicated
   | Single
@@ -487,14 +487,6 @@ derive instance eqRelationshipStatus :: Eq RelationshipStatus
 derive instance genericRelationshipStatus :: Generic RelationshipStatus _
 
 instance showRelationshipStatus :: Show RelationshipStatus where
-  show = genericShow
-
-data MarriageInfo = MarriageInfo {spouse :: String, date :: Day}
-
-derive instance eqMarriageInfo :: Eq MarriageInfo
-derive instance genericMarriageInfo :: Generic MarriageInfo _
-
-instance showMarriageInfo :: Show MarriageInfo where
   show = genericShow
 ```
 
@@ -607,7 +599,7 @@ import Data.Show.Generic (genericShow)
 import Data.Time (Day)
 
 data RelationshipStatus
-  = MarriedTo MarriageInfo
+  = MarriedTo {spouse :: String, date :: Day}
   | EngagedTo UserProfile
   | ItsComplicated
   | Single
@@ -616,14 +608,6 @@ derive instance eqRelationshipStatus :: Eq RelationshipStatus
 derive instance genericRelationshipStatus :: Generic RelationshipStatus _
 
 instance showRelationshipStatus :: Show RelationshipStatus where
-  show = genericShow
-
-data MarriageInfo = MarriageInfo {spouse :: String, date :: Day}
-
-derive instance eqMarriageInfo :: Eq MarriageInfo
-derive instance genericMarriageInfo :: Generic MarriageInfo _
-
-instance showMarriageInfo :: Show MarriageInfo where
   show = genericShow
 ```
 
@@ -656,7 +640,7 @@ SellOrder ( TickerSymbol "MSFT" ) 1000
 BuyOrder ( TickerSymbol "MSFT" ) 1000
 ```
 
-6. Define a function `matchOrder` that takes a `TradeOrder` and an `Arary TradeOrder` and returns
+6. Define a function `matchOrder` that takes a `TradeOrder` and an `Array TradeOrder` and returns
    whether or not we matched a sell/trade to an existing opposite trade/sell in the list of orders.
    If there is a match, return the matching entry as well as the list of trade orders **without**
    the matched order[1]. If there is no match, indicate this in the return value.
@@ -710,7 +694,7 @@ instance showUserProfile :: Show UserProfile where
   show = genericShow
 
 data RelationshipStatus
-  = MarriedTo MarriageInfo
+  = MarriedTo {spouse :: String, date :: Day}
   | EngagedTo UserProfile
   | ItsComplicated
   | Single
@@ -721,25 +705,17 @@ derive instance genericRelationshipStatus :: Generic RelationshipStatus _
 instance showRelationshipStatus :: Show RelationshipStatus where
   show = genericShow
 
-data MarriageInfo = MarriageInfo {spouse :: String, date :: Day}
-
-derive instance eqMarriageInfo :: Eq MarriageInfo
-derive instance genericMarriageInfo :: Generic MarriageInfo _
-
-instance showMarriageInfo :: Show MarriageInfo where
-  show = genericShow
-
 profileToString :: UserProfile -> String
-profileToString UserProfile {age, active, interests, relationshipStatus, username} =
+profileToString (UserProfile {age, active, interests, relationshipStatus, username}) =
   let ageString = show age
       activeString = if active then "active" else "not active"
       interestsString = intercalate ", " interests
       relationshipStatusString = case relationshipStatus of
-        MarriedTo MarriageInfo {spouse, date} ->
+        MarriedTo {spouse, date} ->
           let dateString = Time.showGregorian date
            in -- `unwords` takes an `Arry String` and joins them into a string with spaces inbetween
               unwords ["Married to:", spouse, "on", dateString]
-        EngagedTo UserProfile {username = spouseUsername} ->
+        EngagedTo (UserProfile {username: spouseUsername}) ->
           unwords ["Engaged to:", spouseUsername]
         ItsComplicated -> "It's complicated"
         Single -> "Single"
@@ -765,13 +741,13 @@ If we now construct our `rickard` profile with this in mind we get the following
 
 ```purescript
 > rickard = UserProfile {
-     username = "rickard",
-     age = 34,
-     active = true,
-     interests = ["Programming", "Problem Solving", "Teaching"],
-     relationshipStatus = MarriedTo MarriageInfo {
-       spouse = "Ivana",
-       date = Time.fromGregorian 2016 06 04
+     username: "rickard",
+     age: 34,
+     active: true,
+     interests: ["Programming", "Problem Solving", "Teaching"],
+     relationshipStatus: MarriedTo {
+       spouse: "Ivana",
+       date: Time.fromGregorian 2016 06 04
      }
    }
 > profileToString rickard
@@ -790,18 +766,22 @@ site. However, if we instead make the `spouse` field take a type that allows us 
 **or** a userprofile, we can express this possibility clearly:
 
 ```purescript
--- Our `MarriageInfo` record now takes a `Spouse` type, which itself is a more
--- expressive type allowing for either a string or a user profile
 import Prelude
 
 import Data.Show.Generic (genericShow)
 
-data MarriageInfo = MarriageInfo {spouse :: Spouse, date :: Day}
+-- Our `MarriageInfo` record now takes a `Spouse` type, which itself is a more
+-- expressive type allowing for either a string or a user profile
+data RelationshipStatus
+  = MarriedTo {spouse :: Spouse, date :: Day}
+  | EngagedTo UserProfile
+  | ItsComplicated
+  | Single
 
-derive instance eqMarriageInfo :: Eq MarriageInfo
-derive instance genericMarriageInfo :: Generic MarriageInfo _
+derive instance eqRelationshipStatus :: Eq RelationshipStatus
+derive instance genericRelationshipStatus :: Generic RelationshipStatus _
 
-instance showMarriageInfo :: Show MarriageInfo where
+instance showRelationshipStatus :: Show RelationshipStatus where
   show = genericShow
 
 data Spouse
@@ -819,13 +799,13 @@ This will give us the same capability as before, because we still support spouse
 
 ```purescript
 > rickard = UserProfile {
-     username = "rickard",
-     age = 34,
-     active = true,
-     interests = ["Programming", "Problem Solving", "Teaching"],
-     relationshipStatus = MarriedTo MarriageInfo {
-       spouse = SpouseName "Ivana",
-       date = Time.fromGregorian 2016 06 04
+     username: "rickard",
+     age: 34,
+     active: true,
+     interests: ["Programming", "Problem Solving", "Teaching"],
+     relationshipStatus: MarriedTo {
+       spouse: SpouseName "Ivana",
+       date: Time.fromGregorian 2016 06 04
      }
    }
 > profileToString rickard
@@ -836,14 +816,14 @@ Solving, Teaching"
 But we can now also use a user profile in our `spouse` field:
 
 ```purescript
-> ivana = UserProfile {
-     username = "ivana",
-     age = 31,
-     active = true,
-     interests = ["Web Design", "Cats", "Beer"],
-     relationshipStatus = MarriedTo MarriageInfo {
-       spouse = SpouseProfile rickard,
-       date = Time.fromGregorian 2016 06 04
+> ivana: UserProfile {
+     username: "ivana",
+     age: 31,
+     active: true,
+     interests: ["Web Design", "Cats", "Beer"],
+     relationshipStatus: MarriedTo {
+       spouse: SpouseProfile rickard,
+       date: Time.fromGregorian 2016 06 04
      }
    }
 > profileToString ivana
@@ -858,8 +838,8 @@ other.
 
 ### Exercises (Combining records and unions)
 
-1. Modify the `profileToString` function[0] to take into account that our `spouse` name in
-   `MarriageInfo` is now a `Spouse`; this means we have to look closer at the data with the
+1. Modify the `profileToString` function[0] to take into account that our `spouse` name in the
+   `MarriageInfo` payload is now a `Spouse`; this means we have to look closer at the data with the
    `Spouse` type in mind to get a string value out of it.
 
 2. Modify the `EngagedTo` constructor in `RelationshipStatus` to also take a `Spouse` and then
@@ -877,7 +857,7 @@ import Data.Show.Generic (genericShow)
 import Data.Time (Day)
 import Data.Time as Time
 
-data UserProfile = UserProfile
+newtype UserProfile = UserProfile
   { username :: String,
     age :: Int,
     active :: Boolean,
@@ -892,7 +872,7 @@ instance showUserProfile :: Show UserProfile where
   show = genericShow
 
 data RelationshipStatus
-  = MarriedTo MarriageInfo
+  = MarriedTo {spouse :: Spouse, date :: Day}
   | EngagedTo UserProfile
   | ItsComplicated
   | Single
@@ -901,14 +881,6 @@ derive instance eqRelationshipStatus :: Eq RelationshipStatus
 derive instance genericRelationshipStatus :: Generic RelationshipStatus _
 
 instance showRelationshipStatus :: Show RelationshipStatus where
-  show = genericShow
-
-data MarriageInfo = MarriageInfo {spouse :: Spouse, date :: Day}
-
-derive instance eqMarriageInfo :: Eq MarriageInfo
-derive instance genericMarriageInfo :: Generic MarriageInfo _
-
-instance showMarriageInfo :: Show MarriageInfo where
   show = genericShow
 
 data Spouse
@@ -927,11 +899,11 @@ profileToString UserProfile {age, active, interests, relationshipStatus, usernam
       activeString = if active then "active" else "not active"
       interestsString = intercalate ", " interests
       relationshipStatusString = case relationshipStatus of
-        MarriedTo MarriageInfo {spouse, date} ->
+        MarriedTo {spouse, date} ->
           let dateString = Time.showGregorian date
            in -- `unwords` takes an `Array String` and joins them into a string with spaces inbetween
               unwords ["Married to:", spouse, "on", dateString]
-        EngagedTo UserProfile {username = spouseUsername} ->
+        EngagedTo (UserProfile {username: spouseUsername}) ->
           unwords ["Engaged to:", spouseUsername]
         ItsComplicated -> "It's complicated"
         Single -> "Single"
@@ -995,7 +967,7 @@ import Prelude
 
 import Data.Show.Generic (genericShow)
 
-data HttpResponse a = HttpResponse
+newtype HttpResponse a = HttpResponse
   { status :: HttpStatus,
     headers :: Array HttpHeader,
     body :: a
@@ -1018,7 +990,7 @@ derive instance genericHttpStatus :: Generic HttpStatus _
 instance showHttpStatus :: Show HttpStatus where
   show = genericShow
 
-data HttpHeader = HttpHeader
+newtype HttpHeader = HttpHeader
   { headerName :: String,
     headerValue :: String 
   }
@@ -1285,10 +1257,10 @@ resourceLoadStatusToMaybe (Loaded resource) = Just resource
 
 <!-- markdownlint-disable MD013 -->
 ```purescript
-> user = User {username = Username "gonz", email = Email "rickard.andersson@quanterall.com", fullName = Just (FullName "Rickard Andersson"), phone = Just (PhoneNumber "555 363 22 34")}
+> user = User {username: Username "gonz", email: Email "rickard.andersson@quanterall.com", fullName: Just (FullName "Rickard Andersson"), phone: Just (PhoneNumber "555 363 22 34")}
 > showUserPhoneNumber user
 "555 363 22 34"
-> userWithoutPhone = user {phone = Nothing}
+> userWithoutPhone = user {phone: Nothing}
 > showUserPhoneNumber userWithoutPhone 
 "N/A"
 ```
@@ -1318,10 +1290,10 @@ Just "hello"
 
 <!-- markdownlint-disable MD013 -->
 ```purescript
-> user = User {username = Username "gonz", email = Email "rickard.andersson@quanterall.com", fullName = Just (Fullname "Rickard Andersson"), phone = Just (PhoneNumber "555 363 22 34")}
+> user = User {username: Username "gonz", email: Email "rickard.andersson@quanterall.com", fullName: Just (Fullname "Rickard Andersson"), phone: Just (PhoneNumber "555 363 22 34")}
 > showUserPhoneNumber user
 "555 363 22 34"
-> userWithoutPhone = user {phone = Nothing}
+> userWithoutPhone = user {phone: Nothing}
 > showUserPhoneNumber userWithoutPhone 
 "N/A"
 ```
